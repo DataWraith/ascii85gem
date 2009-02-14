@@ -1,5 +1,5 @@
 
-class Ascii85
+module Ascii85
 
   def self.encode(str, wrap_lines = 80)
 
@@ -139,6 +139,6 @@ class Ascii85
     return result
   end
 
-end
+  class DecodingError < StandardError; end
 
-class Ascii85::DecodingError < StandardError; end
+end

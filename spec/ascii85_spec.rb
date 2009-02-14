@@ -47,8 +47,8 @@ describe Ascii85 do
       test_str += rand(256).chr
     end
 
-    encoded = Ascii85.encode(test_str)
-    decoded = Ascii85.decode(encoded)
+    encoded = Ascii85::encode(test_str)
+    decoded = Ascii85::decode(encoded)
 
     decoded.should == test_str
   end
@@ -57,7 +57,7 @@ describe Ascii85 do
 
     it "should encode all specified test-cases correctly" do
       TEST_CASES.each_pair do |input, encoded|
-        Ascii85.encode(input).should == encoded
+        Ascii85::encode(input).should == encoded
       end
     end
 
@@ -67,13 +67,13 @@ describe Ascii85 do
       #
       # No wrap
       #
-      Ascii85.encode(test_str, false).count("\n").should == 0
+      Ascii85::encode(test_str, false).count("\n").should == 0
 
       #
       # x characters per line, except for the last one
       #
       x = 2 + rand(255) # < test_str.length
-      encoded = Ascii85.encode(test_str, x)
+      encoded = Ascii85::encode(test_str, x)
 
       # Determine the length of all lines
       count_arr = []
@@ -96,7 +96,7 @@ describe Ascii85 do
     end
 
     it "should not split the delimiters to achieve correct line length" do
-      Ascii85.encode("\0" * 4, 4).should == "<~z\n~>"
+      Ascii85::encode("\0" * 4, 4).should == "<~z\n~>"
     end
 
   end
@@ -105,17 +105,17 @@ describe Ascii85 do
 
     it "should decode all specified test-cases correctly" do
       TEST_CASES.each_pair do |decoded, input|
-        Ascii85.decode(input).should == decoded
+        Ascii85::decode(input).should == decoded
       end
     end
 
     it "should ignore everything before/after the delimiter-pairs" do
-      Ascii85.decode("Doesn't contain delimiters").should == ''
-      Ascii85.decode("FooBar<~z~>BazQux").should == ("\0" * 4)
+      Ascii85::decode("Doesn't contain delimiters").should == ''
+      Ascii85::decode("FooBar<~z~>BazQux").should == ("\0" * 4)
     end
 
     it "should ignore whitespace" do
-      decoded = Ascii85.decode("<~6   #LdYA\r\08\n  \n\n- *rF*(i\"Ch[s \t(D.RU,@ <-\'jDJ=0\f/~>")
+      decoded = Ascii85::decode("<~6   #LdYA\r\08\n  \n\n- *rF*(i\"Ch[s \t(D.RU,@ <-\'jDJ=0\f/~>")
       decoded.should == 'Antidisestablishmentarianism'
     end
 
@@ -123,25 +123,25 @@ describe Ascii85 do
 
       it "should raise DecodingError if it encounters a word >= 2**32" do
         lambda {
-          Ascii85.decode('<~s8W-#~>')
+          Ascii85::decode('<~s8W-#~>')
         }.should raise_error Ascii85::DecodingError
       end
 
       it "should raise DecodingError if it encounters an invalid character" do
         lambda {
-          Ascii85.decode('<~!!y!!~>')
+          Ascii85::decode('<~!!y!!~>')
         }.should raise_error Ascii85::DecodingError
       end
 
       it "should raise DecodingError if the last tuple consists of a single character" do
         lambda {
-          Ascii85.decode('<~!~>')
+          Ascii85::decode('<~!~>')
         }.should raise_error Ascii85::DecodingError
       end
 
       it "should raise DecodingError if a z is found inside a 5-tuple" do
         lambda {
-          Ascii85.decode('<~!!z!!~>')
+          Ascii85::decode('<~!!z!!~>')
         }.should raise_error Ascii85::DecodingError
       end
 
