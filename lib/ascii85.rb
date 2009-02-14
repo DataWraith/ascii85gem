@@ -100,7 +100,7 @@ module Ascii85
   #     Ascii85::decode("<~;KZGo~>")
   #     => "Ruby"
   #
-  #     Ascii85::decode("Foo<~;KZGo~>Bar<~;KZGo~>Qux")
+  #     Ascii85::decode("Foo<~;KZGo~>Bar<~;KZGo~>Baz")
   #     => "Ruby"
   #
   #     Ascii85::decode("No markers")
