@@ -11,6 +11,7 @@
 
 
 module Ascii85
+  # The gem version number
   VERSION = '0.9.0'
 
   #
@@ -93,7 +94,7 @@ module Ascii85
   end
 
   #
-  # Searches through +str+ and decodes the _first_ Ascii85-String found
+  # Searches through +str+ and decodes the _first_ Ascii85-String found.
   #
   # #decode expects an Ascii85-encoded String enclosed in <~ and ~>. It will
   # ignore all characters outside these markers.
@@ -189,6 +190,16 @@ module Ascii85
     return result
   end
 
+  #
+  # This error is raised when Ascii85::decode encounters one of the following
+  # problems in the input:
+  #
+  # * An invalid character. Valid characters are '!'..'u' and 'z'.
+  # * A 'z' character inside a 5-tuple. 'z's are only valid on their own.
+  # * An invalid 5-tuple that decodes to >= 2**32
+  # * The last tuple consisting of a single character. Valid tuples always have
+  #   at least two characters.
+  #
   class DecodingError < StandardError; end
 
 end
