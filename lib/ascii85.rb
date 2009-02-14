@@ -6,11 +6,12 @@
 # http://en.wikipedia.org/wiki/Ascii85 for more information about the format.
 #
 # Author::  Johannes Holzfuß <Drangon@gmx.de>
-# License:: Distributed under the MIT License (see LICENSE file)
+# License:: Distributed under the MIT License (see README.txt)
 #
 
 
 module Ascii85
+  VERSION = '0.9.0'
 
   #
   # Encodes the given String as Ascii85.

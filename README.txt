@@ -1,3 +1,43 @@
+= Ascii85
+
+* http://ascii85.rubyforge.org
+
+== DESCRIPTION:
+
+Ascii85 is a simple gem that provides methods for encoding/decoding Adobe's
+binary-to-text encoding of the same name.
+
+See http://www.adobe.com/products/postscript/pdfs/PLRM.pdf page 131 and
+http://en.wikipedia.org/wiki/Ascii85 for more information about the format.
+
+
+== SYNOPSIS:
+
+  require 'rubygems'
+  require 'ascii85'
+
+  Ascii85::encode("Ruby")
+  => "<~;KZGo~>"
+
+  Ascii85::decode("<~;KZGo~>")
+  => "Ruby"
+
+In addition, Ascii85::encode can take a second parameter that specifies the
+length of the returned lines. The default is 80; use +false+ for unlimited.
+
+Ascii85::decode expects the input to be enclosed in <~ and ~>. It ignores
+everything outside of these.
+
+
+== INSTALL:
+
+* sudo gem install ascii85
+
+
+== LICENSE:
+
+(The MIT License)
+
 Copyright (c) 2009 Johannes Holzfuß
 
 Permission is hereby granted, free of charge, to any person obtaining a

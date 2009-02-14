@@ -1,0 +1,6 @@
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+lib/ascii85.rb
+spec/ascii85_spec.rb

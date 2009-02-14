@@ -1,10 +1,14 @@
 
 require 'rubygems'
 
+require 'hoe'
 require 'rake'
 require 'rake/clean'
 require 'rake/rdoctask'
 require 'spec/rake/spectask'
+
+require 'lib/ascii85.rb'
+
 
 # rspec
 
@@ -18,19 +22,23 @@ Spec::Rake::SpecTask.new('specdoc') do |t|
   t.spec_opts = ["--color", "--format=specdoc"]
 end
 
-# rdoc
 
-desc "Generate documentation"
-Rake::RDocTask.new do |rdoc|
-  rdoc.title = "Ascii85"
-  rdoc.rdoc_dir = 'doc/'
-  rdoc.options += [
-    '--charset=utf8',
-    '--line-numbers',
-  ]
-  rdoc.main = "Ascii85"
-  rdoc.rdoc_files.add(FileList['lib/**/*.rb'] + ['LICENSE'])
+# Hoe
+
+Hoe.new('Ascii85', Ascii85::VERSION) do |p|
+  p.author  = "Johannes Holzfuß"
+  p.email   = "Drangon@gmx.de"
+  p.summary = "Ascii85 encoder/decoder"
+
+  p.description = "Provides methods to encode/decode Adobe's Ascii85. " +
+                  "(see en.wikipedia.org/wiki/Ascii85)"
+
+  p.remote_rdoc_dir = ''
+
+  p.testlib    = "spec"
+  p.test_globs = "spec/ascii85_spec.rb"
 end
+
 
 # default task is spec
 task :default => :spec
