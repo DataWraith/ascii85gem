@@ -5,7 +5,7 @@
 # See http://www.adobe.com/products/postscript/pdfs/PLRM.pdf page 131 and
 # http://en.wikipedia.org/wiki/Ascii85 for more information about the format.
 #
-# Author::  Johannes Holzfuß <Drangon@gmx.de>
+# Author::  Johannes Holzfuß (Drangon@gmx.de)
 # License:: Distributed under the MIT License (see README.txt)
 #
 
