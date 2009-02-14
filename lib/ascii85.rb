@@ -139,7 +139,7 @@ module Ascii85
           # Expand z to 0-word
           result << 0
         else
-          raise(Ascii85::DecodingError, "found 'z' inside Ascii85 5-tuple")
+          raise(Ascii85::DecodingError, "Found 'z' inside Ascii85 5-tuple")
         end
 
       when '!'..'u'

@@ -95,7 +95,7 @@ describe Ascii85 do
       count_arr.should be_empty
     end
 
-    it "should not split the delimiters to achieve correct line length" do
+    it "should not split the end-marker to achieve correct line length" do
       Ascii85::encode("\0" * 4, 4).should == "<~z\n~>"
     end
 
