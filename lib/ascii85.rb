@@ -12,7 +12,7 @@
 
 module Ascii85
   # The gem version number
-  VERSION = '0.9.0'
+  VERSION = '0.9.0' # :nodoc:
 
   #
   # Encodes the given String as Ascii85.
