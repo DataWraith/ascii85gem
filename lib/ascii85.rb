@@ -1,6 +1,37 @@
+#
+# Ascii85 is an implementation of Adobe's binary-to-text encoding of the same
+# name in pure Ruby.
+#
+# See http://www.adobe.com/products/postscript/pdfs/PLRM.pdf page 131 and
+# http://en.wikipedia.org/wiki/Ascii85 for more information about the format.
+#
+# Author::  Johannes Holzfuß <Drangon@gmx.de>
+# License:: Distributed under the MIT License (see LICENSE file)
+#
+
 
 module Ascii85
 
+  #
+  # Encodes the given String as Ascii85.
+  #
+  # If +wrap_lines+ evaluates to +false+, the output will be returned as a
+  # single long line. Otherwise #encode formats the output into lines of
+  # length +wrap_lines+ (minimum is 2).
+  #
+  #     Ascii85::encode("Ruby")
+  #     => <~;KZGo~>
+  #
+  #     Ascii85::encode("Supercalifragilisticexpialidocious", 15)
+  #     => <~;g!%jEarNoBkD
+  #        BoB5)0rF*),+AU&
+  #        0.@;KXgDe!L"F`R
+  #        ~>
+  #
+  #     Ascii85::encode("Supercalifragilisticexpialidocious", false)
+  #     => <~;g!%jEarNoBkDBoB5)0rF*),+AU&0.@;KXgDe!L"F`R~>
+  #
+  #
   def self.encode(str, wrap_lines = 80)
 
     return '' if str.to_s.empty?
@@ -60,6 +91,24 @@ module Ascii85
     return wrapped.join("\n")
   end
 
+  #
+  # Searches through +str+ and decodes the _first_ Ascii85-String found
+  #
+  # #decode expects an Ascii85-encoded String enclosed in <~ and ~>. It will
+  # ignore all characters outside these markers.
+  #
+  #     Ascii85::decode("<~;KZGo~>")
+  #     => "Ruby"
+  #
+  #     Ascii85::decode("Foo<~;KZGo~>Bar<~;KZGo~>Qux")
+  #     => "Ruby"
+  #
+  #     Ascii85::decode("No markers")
+  #     => ""
+  #
+  # #decode will raise Ascii85::DecodingError when malformed input is
+  # encountered.
+  #
   def self.decode(str)
 
     # Find the Ascii85 encoded data between <~ and ~>

@@ -28,7 +28,8 @@ Rake::RDocTask.new do |rdoc|
     '--charset=utf8',
     '--line-numbers',
   ]
-  rdoc.rdoc_files.add(FileList['lib/**/*.rb'])
+  rdoc.main = "Ascii85"
+  rdoc.rdoc_files.add(FileList['lib/**/*.rb'] + ['LICENSE'])
 end
 
 # default task is spec
