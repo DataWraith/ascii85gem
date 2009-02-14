@@ -37,7 +37,7 @@ module Ascii85
     return '' if str.to_s.empty?
 
     # Compute number of \0s to pad the message with (0..3)
-    padding_length = (4 - (str.to_s.length % 4)) % 4
+    padding_length = (-str.to_s.length) % 4
 
     # Extract big-endian integers
     tuples = (str.to_s + ("\0" * padding_length)).unpack('N*')
