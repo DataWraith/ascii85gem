@@ -31,7 +31,7 @@ everything outside of these.
 
 == INSTALL:
 
-* sudo gem install ascii85
+* sudo gem install Ascii85
 
 
 == LICENSE:
