@@ -30,8 +30,7 @@ Hoe.new('Ascii85', Ascii85::VERSION) do |p|
   p.email   = "Drangon@gmx.de"
   p.summary = "Ascii85 encoder/decoder"
 
-  p.description = "Provides methods to encode/decode Adobe's Ascii85. " +
-                  "(see en.wikipedia.org/wiki/Ascii85)"
+  p.description = "Ascii85 provides methods to encode/decode Adobe's binary-to-text encoding of the same name."
 
   p.remote_rdoc_dir = ''
 
