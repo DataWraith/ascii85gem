@@ -51,7 +51,7 @@ module Ascii85
       else
         tmp = ""
         5.times do
-          tmp += ((tuple % 85) + 33).chr
+          tmp << ((tuple % 85) + 33).chr
           tuple /= 85
         end
         tmp.reverse
@@ -87,7 +87,7 @@ module Ascii85
     if (wrapped.last.length + 2) > line_length
       wrapped << '~>'
     else
-      wrapped[-1] += '~>'
+      wrapped[-1] << '~>'
     end
 
     return wrapped.join("\n")
@@ -180,9 +180,9 @@ module Ascii85
       count -= 1
       word += 85**(4 - count)
 
-      result += ((word >> 24) & 255).chr if count >= 1
-      result += ((word >> 16) & 255).chr if count >= 2
-      result += ((word >>  8) & 255).chr if count == 3
+      result << ((word >> 24) & 255).chr if count >= 1
+      result << ((word >> 16) & 255).chr if count >= 2
+      result << ((word >>  8) & 255).chr if count == 3
     end
 
     return result
