@@ -121,8 +121,6 @@ module Ascii85
     # Remove the delimiters
     input = input.to_s[2..-3]
 
-    return '' if input.empty?
-
     # Decode
     result = []
 

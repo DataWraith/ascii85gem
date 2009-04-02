@@ -109,8 +109,9 @@ describe Ascii85 do
       end
     end
 
-    it "should ignore everything before/after the delimiter-pairs" do
+    it "should only process data within delimiters" do
       Ascii85::decode("Doesn't contain delimiters").should == ''
+      Ascii85::decode("<~~>").should == ''
       Ascii85::decode("FooBar<~z~>BazQux").should == ("\0" * 4)
     end
 
