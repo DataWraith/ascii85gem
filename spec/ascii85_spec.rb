@@ -6,6 +6,10 @@ require 'ascii85'
 
 describe Ascii85 do
 
+  before( :all ) do
+    @string_has_encoding = "String".methods.include?(:encoding)
+  end
+
   TEST_CASES = {
 
     ""          => "",
@@ -32,7 +36,7 @@ describe Ascii85 do
     'Antidisestablishmentarianism' => '<~6#LdYA8-*rF*(i"Ch[s(D.RU,@<-\'jDJ=0/~>',
 
     # Dōmo arigatō, Mr. Roboto (according to Wikipedia)
-    'どうもありがとうミスターロボット'.force_encoding('ASCII-8BIT') =>
+    'どうもありがとうミスターロボット' =>
         "<~j+42iJVN3:K&_E6j+<0KJW/W?W8iG`j+EuaK\"9on^Z0sZj+FJoK:LtSKB%T?~>",
 
     [Math::PI].pack('G') => "<~5RAV2<(&;T~>",
@@ -105,7 +109,11 @@ describe Ascii85 do
 
     it "should decode all specified test-cases correctly" do
       TEST_CASES.each_pair do |decoded, input|
-        Ascii85::decode(input).should == decoded
+        if @string_has_encoding
+          Ascii85::decode(input).should == decoded.dup.force_encoding('ASCII-8BIT')
+        else
+          Ascii85::decode(input).should == decoded
+        end
       end
     end
 
@@ -122,7 +130,7 @@ describe Ascii85 do
     end
 
     it "should return ASCII-8BIT encoded strings in Ruby 1.9" do
-      if "String".methods.include?(:encoding)
+      if @string_has_encoding
         Ascii85::decode("<~;KZGo~>").encoding.to_s.should == "ASCII-8BIT"
       end
     end
