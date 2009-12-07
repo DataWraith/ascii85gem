@@ -36,13 +36,14 @@ module Ascii85
   #
   def self.encode(str, wrap_lines = 80)
 
-    return '' if str.to_s.empty?
+    to_encode = str.to_s
+    return '' if to_encode.empty?
 
     # Compute number of \0s to pad the message with (0..3)
-    padding_length = (-str.to_s.length) % 4
+    padding_length = (-to_encode.length) % 4
 
     # Extract big-endian integers
-    tuples = (str.to_s + ("\0" * padding_length)).unpack('N*')
+    tuples = (to_encode + ("\0" * padding_length)).unpack('N*')
 
     # Encode
     tuples.map! do |tuple|
