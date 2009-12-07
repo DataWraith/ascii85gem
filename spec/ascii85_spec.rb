@@ -32,7 +32,7 @@ describe Ascii85 do
     'Antidisestablishmentarianism' => '<~6#LdYA8-*rF*(i"Ch[s(D.RU,@<-\'jDJ=0/~>',
 
     # Dōmo arigatō, Mr. Roboto (according to Wikipedia)
-    'どうもありがとうミスターロボット' =>
+    'どうもありがとうミスターロボット'.force_encoding('ASCII-8BIT') =>
         "<~j+42iJVN3:K&_E6j+<0KJW/W?W8iG`j+EuaK\"9on^Z0sZj+FJoK:LtSKB%T?~>",
 
     [Math::PI].pack('G') => "<~5RAV2<(&;T~>",
@@ -118,6 +118,12 @@ describe Ascii85 do
     it "should ignore whitespace" do
       decoded = Ascii85::decode("<~6   #LdYA\r\08\n  \n\n- *rF*(i\"Ch[s \t(D.RU,@ <-\'jDJ=0\f/~>")
       decoded.should == 'Antidisestablishmentarianism'
+    end
+
+    it "should return ASCII-8BIT encoded strings in Ruby 1.9" do
+      if "String".methods.include?(:encoding)
+        Ascii85::decode("<~;KZGo~>").encoding.to_s.should == "ASCII-8BIT"
+      end
     end
 
     describe "Error conditions" do
