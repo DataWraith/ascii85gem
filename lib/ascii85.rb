@@ -15,7 +15,7 @@ module Ascii85
   VERSION = '0.9.0' # :nodoc:
 
   #
-  # Encodes the given String as Ascii85.
+  # Encodes the bytes of the given String as Ascii85.
   #
   # If +wrap_lines+ evaluates to +false+, the output will be returned as a
   # single long line. Otherwise #encode formats the output into lines of
@@ -98,7 +98,8 @@ module Ascii85
   # Searches through +str+ and decodes the _first_ Ascii85-String found.
   #
   # #decode expects an Ascii85-encoded String enclosed in <~ and ~>. It will
-  # ignore all characters outside these markers.
+  # ignore all characters outside these markers. The returned strings are
+  # always encoded as ASCII-8BIT.
   #
   #     Ascii85::decode("<~;KZGo~>")
   #     => "Ruby"
