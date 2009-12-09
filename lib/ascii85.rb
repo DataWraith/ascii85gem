@@ -17,8 +17,8 @@ module Ascii85
   #
   # Encodes the bytes of the given String as Ascii85.
   #
-  # If +wrap_lines+ evaluates to +false+, the output will be returned as a
-  # single long line. Otherwise #encode formats the output into lines of
+  # If +wrap_lines+ evaluates to +false+, the output will be returned as
+  # a single long line. Otherwise #encode formats the output into lines of
   # length +wrap_lines+ (minimum is 2).
   #
   #     Ascii85::encode("Ruby")
