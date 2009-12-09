@@ -1,43 +1,21 @@
+# encoding: utf-8
 
 require 'rubygems'
-
 require 'hoe'
-require 'rake'
-require 'rake/clean'
-require 'rake/rdoctask'
-require 'spec/rake/spectask'
 
-require 'lib/ascii85.rb'
+Hoe.spec 'Ascii85' do
 
+  developer \
+    "Johannes Holzfuß",
+    "Drangon@gmx.de"
 
-# rspec
+  summary
+    "Ascii85 encoder/decoder"
 
-desc "Run specs"
-Spec::Rake::SpecTask.new do |t|
-  t.spec_opts = ["--color"]
+  description
+    "Ascii85 provides methods to encode/decode Adobe's binary-to-text encoding"
+    "of the same name."
+
+  self.testlib    = "spec"
+  self.test_globs = "spec/*_spec.rb"
 end
-
-desc "Show specdoc"
-Spec::Rake::SpecTask.new('specdoc') do |t|
-  t.spec_opts = ["--color", "--format=specdoc"]
-end
-
-
-# Hoe
-
-Hoe.new('Ascii85', Ascii85::VERSION) do |p|
-  p.author  = "Johannes Holzfuß"
-  p.email   = "Drangon@gmx.de"
-  p.summary = "Ascii85 encoder/decoder"
-
-  p.description = "Ascii85 provides methods to encode/decode Adobe's binary-to-text encoding of the same name."
-
-  p.remote_rdoc_dir = ''
-
-  p.testlib    = "spec"
-  p.test_globs = "spec/ascii85_spec.rb"
-end
-
-
-# default task is spec
-task :default => :spec
