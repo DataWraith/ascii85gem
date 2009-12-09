@@ -65,6 +65,15 @@ describe Ascii85 do
       end
     end
 
+    it "[Ruby 1.9] should encode Strings in different encodings correctly" do
+      if @string_has_encoding
+        input_EUC_JP = 'どうもありがとうミスターロボット'.encode('EUC-JP')
+        input_Ascii8 = input_EUC_JP.force_encoding('ASCII-8BIT')
+
+        Ascii85::encode(input_EUC_JP).should == Ascii85::encode(input_Ascii8)
+      end
+    end
+
     it "should produce output lines no longer than specified" do
       test_str = '0123456789' * 30
 
@@ -117,6 +126,18 @@ describe Ascii85 do
       end
     end
 
+    it "[Ruby 1.9] should accept valid input in encodings other than the default" do
+      if @string_has_encoding
+        x = Ascii85::encode("Ragnarök")
+        x = x.encode('ISO8859-15')
+        Ascii85::decode(x).should == "Ragnarök".force_encoding('ASCII-8BIT')
+
+        x = Ascii85::encode("τέχνη")
+        x = x.encode('UTF-16LE')
+        Ascii85::decode(x).should == "τέχνη".force_encoding('ASCII-8BIT')
+      end
+    end
+
     it "should only process data within delimiters" do
       Ascii85::decode("Doesn't contain delimiters").should == ''
       Ascii85::decode("<~~>").should == ''
@@ -129,7 +150,7 @@ describe Ascii85 do
       decoded.should == 'Antidisestablishmentarianism'
     end
 
-    it "should return ASCII-8BIT encoded strings in Ruby 1.9" do
+    it "[Ruby 1.9] should return ASCII-8BIT encoded strings" do
       if @string_has_encoding
         Ascii85::decode("<~;KZGo~>").encoding.name.should == "ASCII-8BIT"
       end

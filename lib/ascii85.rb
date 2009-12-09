@@ -1,3 +1,6 @@
+# encoding: utf-8
+
+
 #
 # Ascii85 is an implementation of Adobe's binary-to-text encoding of the same
 # name in pure Ruby.
@@ -39,8 +42,15 @@ module Ascii85
     to_encode = str.to_s
     return '' if to_encode.empty?
 
+    # Deal with multi-byte encodings
+    if to_encode.methods.include?(:bytesize)
+      input_size = to_encode.bytesize
+    else
+      input_size = to_encode.size
+    end
+
     # Compute number of \0s to pad the message with (0..3)
-    padding_length = (-to_encode.length) % 4
+    padding_length = (-input_size) % 4
 
     # Extract big-endian integers
     tuples = (to_encode + ("\0" * padding_length)).unpack('N*')
@@ -115,8 +125,13 @@ module Ascii85
   #
   def self.decode(str)
 
+    input = str.to_s
+
+    # Convert input to UTF-8 if possible
+    input = input.encode('UTF-8') if input.methods.include?(:encode)
+
     # Find the Ascii85 encoded data between <~ and ~>
-    input = str.to_s.match(/<~.*?~>/mn)
+    input = input.match(/<~.*?~>/mu) # Match newlines, UTF-8 encoding
 
     return '' if input.nil?
 
