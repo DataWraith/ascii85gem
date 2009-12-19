@@ -143,6 +143,7 @@ describe Ascii85 do
       Ascii85::decode("<~~>").should == ''
       Ascii85::decode("FooBar<~z~>BazQux").should == ("\0" * 4)
       Ascii85::decode("<~;KZGo~><~z~>").should == "Ruby"
+      Ascii85::decode("foo~>bar<~baz").should == ''
     end
 
     it "should ignore whitespace" do
