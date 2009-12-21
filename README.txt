@@ -2,6 +2,7 @@
 
 * http://ascii85.rubyforge.org
 
+
 == DESCRIPTION:
 
 Ascii85 is a simple gem that provides methods for encoding/decoding Adobe's

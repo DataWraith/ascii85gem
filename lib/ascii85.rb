@@ -94,7 +94,7 @@ module Ascii85
       wrapped << result.slice(index, line_length)
     end
 
-    # Add end-marker -- on a new line if necessary
+    # Add end-marker – on a new line if necessary
     if (wrapped.last.length + 2) > line_length
       wrapped << '~>'
     else
