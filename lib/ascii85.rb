@@ -77,12 +77,9 @@ module Ascii85
     # Cut off the padding
     tuples[-1] = tuples[-1][0..(4 - padding_length)]
 
-    # Add start-marker and join into a String
-    result = '<~' + tuples.join
-
-    # If we don't need to wrap the lines to a certain length, add ~> and return
+    # If we don't need to wrap the lines, add delimiters and return
     if (!wrap_lines)
-      return result + '~>'
+      return '<~' + tuples.join + '~>'
     end
 
     # Otherwise we wrap the lines
@@ -90,8 +87,10 @@ module Ascii85
     line_length = [2, wrap_lines.to_i].max
 
     wrapped = []
-    0.step(result.length, line_length) do |index|
-      wrapped << result.slice(index, line_length)
+    to_wrap = '<~' + tuples.join
+
+    0.step(to_wrap.length, line_length) do |index|
+      wrapped << to_wrap.slice(index, line_length)
     end
 
     # Add end-marker – on a new line if necessary
