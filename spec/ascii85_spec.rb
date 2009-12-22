@@ -128,13 +128,21 @@ describe Ascii85 do
 
     it "[Ruby 1.9] should accept valid input in encodings other than the default" do
       if @string_has_encoding
-        x = Ascii85::encode("Ragnarök")
-        x = x.encode('ISO8859-15')
-        Ascii85::decode(x).should == "Ragnarök".force_encoding('ASCII-8BIT')
+        input = "Ragnarök  τέχνη  русский язык  I ♥ Ruby"
+        input_ascii85 = Ascii85::encode(input)
 
-        x = Ascii85::encode("τέχνη")
-        x = x.encode('UTF-16LE')
-        Ascii85::decode(x).should == "τέχνη".force_encoding('ASCII-8BIT')
+        # Try to encode input_ascii85 in all possible encodings and see if we
+        # do the right thing in #decode.
+        Encoding.list.each do |encoding|
+          next if encoding.dummy?
+
+          to_test = input_ascii85.encode(encoding)
+
+          lambda {
+            Ascii85::decode(to_test).force_encoding('UTF-8').should == input
+          }.should_not raise_error
+        end
+
       end
     end
 
