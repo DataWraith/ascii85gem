@@ -126,16 +126,30 @@ module Ascii85
 
     input = str.to_s
 
-    # Convert input to UTF-8 if possible
-    input = input.encode('UTF-8') if input.methods.include?(:encode)
+    # Try to compile the regular expression for finding the input between
+    # the <~ and ~> delimiters. In order to work properly with different
+    # input encodings, the RegExp itself is re-encoded to the input encoding
+    # if possible. Thanks to Myrddin Emrys for suggesting this approach
+    # (http://is.gd/5x18O)
+    begin
+      regex = "<~(.*?)?~>"
 
-    # Find the Ascii85 encoded data between <~ and ~>
-    input = input.match(/<~.*?~>/mu) # Match newlines, UTF-8 encoding
+      if regex.methods.include?(:encode)
+        regex = regex.encode(input.encoding)
+      end
+      regex = Regexp.compile(regex, Regexp::MULTILINE)
+
+      # Find the actual data to be decoded
+      input = input.match(regex)
+
+    rescue EncodingError => e
+      raise ArgumentError, "Incompatible input encoding: #{str.encoding.inspect}"
+    end
 
     return '' if input.nil?
 
-    # Remove the delimiters
-    input = input.to_s[2..-3]
+    # Get the matched data as String
+    input = input.captures.first
 
     # Decode
     result = []
