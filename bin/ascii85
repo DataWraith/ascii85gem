@@ -17,7 +17,7 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'ascii85')
 
 ARGV.options do |opts|
   opts.banner = "Usage: #{File.basename($PROGRAM_NAME)} [OPTIONS] [FILE]\n" +
-                "Encodes or decodes FILE or STDIN using Ascii85 and write to STDOUT."
+                "Encodes or decodes FILE or STDIN using Ascii85 and writes to STDOUT."
 
 
   opts.on( "-w", "--wrap COLUMN", Integer,

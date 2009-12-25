@@ -39,7 +39,7 @@ the GNU coreutils. It can be used to encode/decode Ascii85 directly from the
 command-line:
 
     Usage: ascii85 [OPTIONS] [FILE]
-    Encodes or decodes FILE or STDIN using Ascii85 and write to STDOUT.
+    Encodes or decodes FILE or STDIN using Ascii85 and writes to STDOUT.
         -w, --wrap COLUMN                Wrap lines at COLUMN. Default is 80, use 0 for no wrapping
         -d, --decode                     Decode the input
         -h, --help                       Display this help and exit
