@@ -142,7 +142,7 @@ module Ascii85
       # Find the actual data to be decoded
       input = input.match(regex)
 
-    rescue EncodingError => e
+    rescue EncodingError
       raise ArgumentError, "Incompatible input encoding: #{str.encoding.inspect}"
     end
 
