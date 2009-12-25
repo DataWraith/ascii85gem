@@ -106,8 +106,8 @@ module Ascii85
   #
   # Searches through +str+ and decodes the _first_ Ascii85-String found.
   #
-  # #decode expects an Ascii85-encoded String enclosed in <~ and ~>. It will
-  # ignore all characters outside these markers. The returned strings are
+  # #decode expects an Ascii85-encoded String enclosed in <~ and ~> — it
+  # will ignore all characters outside these markers. The returned strings are
   # always encoded as ASCII-8BIT.
   #
   #     Ascii85::decode("<~;KZGo~>")
