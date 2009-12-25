@@ -30,6 +30,20 @@ Ascii85::decode expects the input to be enclosed in <~ and ~>. It ignores
 everything outside of these.
 
 
+== Command-line utility
+
+This gem includes +ascii85+, a command-line utility modeled after +base64+ from
+the GNU coreutils. It can be used to encode/decode Ascii85 directly from the
+command-line:
+
+    Usage: ascii85 [OPTIONS] [FILE]
+    Encodes or decodes FILE or STDIN using Ascii85 and write to STDOUT.
+        -w, --wrap COLUMN                Wrap lines at COLUMN. Default is 80, use 0 for no wrapping
+        -d, --decode                     Decode the input
+        -h, --help                       Display this help and exit
+            --version                    Output version information
+
+
 == INSTALL:
 
 * sudo gem install Ascii85
