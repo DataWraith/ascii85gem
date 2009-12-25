@@ -16,6 +16,8 @@ Hoe.spec 'Ascii85' do
     "Ascii85 provides methods to encode/decode Adobe's binary-to-text encoding"
     "of the same name."
 
-  self.testlib    = "spec"
-  self.test_globs = "spec/*_spec.rb"
+  self.url =
+    ["http://ascii85.rubyforge.org", "http://github.com/drangon/ascii85gem"]
+
+  self.testlib = "spec"
 end
