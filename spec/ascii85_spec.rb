@@ -67,10 +67,10 @@ describe Ascii85 do
 
     it "[Ruby 1.9] should encode Strings in different encodings correctly" do
       if @string_has_encoding
-        input_EUC_JP  = 'どうもありがとうミスターロボット'.encode('EUC-JP')
-        input_Ascii85 = input_EUC_JP.force_encoding('ASCII-8BIT')
+        input_EUC_JP = 'どうもありがとうミスターロボット'.encode('EUC-JP')
+        input_binary = input_EUC_JP.force_encoding('ASCII-8BIT')
 
-        Ascii85::encode(input_EUC_JP).should == Ascii85::encode(input_Ascii85)
+        Ascii85::encode(input_EUC_JP).should == Ascii85::encode(input_binary)
       end
     end
 
