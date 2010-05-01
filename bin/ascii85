@@ -55,8 +55,7 @@ ARGV.options do |opts|
 end
 
 if @options[:file] == '-'
-  $stdin.binmode
-  @input = $stdin.read
+  @input = $stdin.binmode.read
 else
   unless File.exists?(@options[:file])
     abort "File not found: \"#{@options[:file]}\""
