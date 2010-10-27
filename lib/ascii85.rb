@@ -2,11 +2,12 @@
 
 
 #
-# Ascii85 is an implementation of Adobe's binary-to-text encoding of the same
-# name in pure Ruby.
+# Ascii85 is an implementation of Adobe's binary-to-text encoding of the
+# same name in pure Ruby.
 #
-# See http://www.adobe.com/products/postscript/pdfs/PLRM.pdf page 131 and
-# http://en.wikipedia.org/wiki/Ascii85 for more information about the format.
+# See http://www.adobe.com/products/postscript/pdfs/PLRM.pdf page 131
+# and http://en.wikipedia.org/wiki/Ascii85 for more information about
+# the format.
 #
 # Author::  Johannes Holzfuß (Drangon@gmx.de)
 # License:: Distributed under the MIT License (see README.txt)
@@ -21,8 +22,8 @@ module Ascii85
   # Encodes the bytes of the given String as Ascii85.
   #
   # If +wrap_lines+ evaluates to +false+, the output will be returned as
-  # a single long line. Otherwise #encode formats the output into lines of
-  # length +wrap_lines+ (minimum is 2).
+  # a single long line. Otherwise #encode formats the output into lines
+  # of length +wrap_lines+ (minimum is 2).
   #
   #     Ascii85::encode("Ruby")
   #     => <~;KZGo~>
@@ -106,9 +107,9 @@ module Ascii85
   #
   # Searches through +str+ and decodes the _first_ Ascii85-String found.
   #
-  # #decode expects an Ascii85-encoded String enclosed in <~ and ~> — it
-  # will ignore all characters outside these markers. The returned strings are
-  # always encoded as ASCII-8BIT.
+  # #decode expects an Ascii85-encoded String enclosed in <~ and ~> — it will
+  # ignore all characters outside these markers. The returned strings are always
+  # encoded as ASCII-8BIT.
   #
   #     Ascii85::decode("<~;KZGo~>")
   #     => "Ruby"
