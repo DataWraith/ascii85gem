@@ -1,14 +1,10 @@
 # encoding: utf-8
 
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+require 'spec_helper'
 
 require 'ascii85'
 
 describe Ascii85 do
-
-  before( :all ) do
-    @string_has_encoding = "String".methods.include?(:encoding)
-  end
 
   TEST_CASES = {
 
@@ -65,13 +61,11 @@ describe Ascii85 do
       end
     end
 
-    it "[Ruby 1.9] should encode Strings in different encodings correctly" do
-      if @string_has_encoding
-        input_EUC_JP = 'どうもありがとうミスターロボット'.encode('EUC-JP')
-        input_binary = input_EUC_JP.force_encoding('ASCII-8BIT')
+    it "should encode Strings in different encodings correctly", :ruby => 1.9 do
+      input_EUC_JP = 'どうもありがとうミスターロボット'.encode('EUC-JP')
+      input_binary = input_EUC_JP.force_encoding('ASCII-8BIT')
 
-        Ascii85::encode(input_EUC_JP).should == Ascii85::encode(input_binary)
-      end
+      Ascii85::encode(input_EUC_JP).should == Ascii85::encode(input_binary)
     end
 
     it "should produce output lines no longer than specified" do
@@ -116,42 +110,42 @@ describe Ascii85 do
 
   describe "#decode" do
 
-    it "should decode all specified test-cases correctly" do
+    it "should decode all specified test-cases correctly", :ruby => 1.9 do
       TEST_CASES.each_pair do |decoded, input|
-        if @string_has_encoding
-          Ascii85::decode(input).should == decoded.dup.force_encoding('ASCII-8BIT')
-        else
-          Ascii85::decode(input).should == decoded
-        end
+        Ascii85::decode(input).should == decoded.dup.force_encoding('ASCII-8BIT')
       end
     end
 
-    it "[Ruby 1.9] should accept valid input in encodings other than the default" do
-      if @string_has_encoding
-        input = "Ragnarök  τέχνη  русский язык  I ♥ Ruby"
-        input_ascii85 = Ascii85::encode(input)
+    it "should decode all specified test-cases correctly", :ruby => 1.8 do
+      TEST_CASES.each_pair do |decoded, input|
+        Ascii85::decode(input).should == decoded
+      end
+    end
 
-        # Try to encode input_ascii85 in all possible encodings and see if we
-        # do the right thing in #decode.
-        Encoding.list.each do |encoding|
-          next if encoding.dummy?
+    it "should accept valid input in encodings other than the default", :ruby => 1.9 do
 
-          to_test = input_ascii85.encode(encoding)
+      input = "Ragnarök  τέχνη  русский язык  I ♥ Ruby"
+      input_ascii85 = Ascii85::encode(input)
 
-          lambda {
-            Ascii85::decode(to_test).force_encoding('UTF-8').should == input
-          }.should_not raise_error
-        end
+      # Try to encode input_ascii85 in all possible encodings and see if we
+      # do the right thing in #decode.
+      Encoding.list.each do |encoding|
+        next if encoding.dummy?
 
+        to_test = input_ascii85.encode(encoding)
+
+        lambda {
+          Ascii85::decode(to_test).force_encoding('UTF-8').should == input
+        }.should_not raise_error
       end
     end
 
     it "should only process data within delimiters" do
+      Ascii85::decode("<~~>").should                       == ''
       Ascii85::decode("Doesn't contain delimiters").should == ''
-      Ascii85::decode("<~~>").should == ''
-      Ascii85::decode("FooBar<~z~>BazQux").should == ("\0" * 4)
-      Ascii85::decode("<~;KZGo~><~z~>").should == "Ruby"
-      Ascii85::decode("foo~>bar<~baz").should == ''
+      Ascii85::decode("FooBar<~z~>BazQux").should          == ("\0" * 4)
+      Ascii85::decode("<~;KZGo~><~z~>").should             == "Ruby"
+      Ascii85::decode("foo~>bar<~baz").should              == ''
     end
 
     it "should ignore whitespace" do
@@ -159,7 +153,8 @@ describe Ascii85 do
       decoded.should == 'Antidisestablishmentarianism'
     end
 
-    it "[Ruby 1.9] should return ASCII-8BIT encoded strings" do
+    it "should return ASCII-8BIT encoded strings", :ruby => 1.9 do
+
       if @string_has_encoding
         Ascii85::decode("<~;KZGo~>").encoding.name.should == "ASCII-8BIT"
       end
