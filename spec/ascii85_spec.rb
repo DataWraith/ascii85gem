@@ -154,10 +154,7 @@ describe Ascii85 do
     end
 
     it "should return ASCII-8BIT encoded strings", :ruby => 1.9 do
-
-      if @string_has_encoding
-        Ascii85::decode("<~;KZGo~>").encoding.name.should == "ASCII-8BIT"
-      end
+      Ascii85::decode("<~;KZGo~>").encoding.name.should == "ASCII-8BIT"
     end
 
     describe "Error conditions" do
