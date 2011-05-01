@@ -180,7 +180,7 @@ module Ascii85
 
         if count == 5
 
-          if word >= 2**32
+          if word > 0xffffffff
             raise(Ascii85::DecodingError,
                   "Invalid Ascii85 5-tuple (#{word} >= 2**32)")
           end
