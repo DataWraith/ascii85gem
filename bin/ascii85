@@ -72,10 +72,10 @@ end
 
 if @options[:decode]
   begin
-    print Ascii85::decode(@input)
+    print Ascii85.decode(@input)
   rescue Ascii85::DecodingError => error
     abort "Decoding Error: #{error.message.to_s}"
   end
 else
-  print Ascii85::encode(@input, @options[:wrap])
+  print Ascii85.encode(@input, @options[:wrap])
 end

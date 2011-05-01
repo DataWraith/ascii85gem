@@ -17,17 +17,17 @@ http://en.wikipedia.org/wiki/Ascii85 for more information about the format.
   require 'rubygems'
   require 'ascii85'
 
-  Ascii85::encode("Ruby")
+  Ascii85.encode("Ruby")
   => "<~;KZGo~>"
 
-  Ascii85::decode("<~;KZGo~>")
+  Ascii85.decode("<~;KZGo~>")
   => "Ruby"
 
-In addition, Ascii85::encode can take a second parameter that specifies the
+In addition, Ascii85.encode can take a second parameter that specifies the
 length of the returned lines. The default is 80; use +false+ for unlimited.
 
-Ascii85::decode expects the input to be enclosed in <~ and ~> — it
-ignores everything outside of these. The output of Ascii85::decode
+Ascii85.decode expects the input to be enclosed in <~ and ~> — it
+ignores everything outside of these. The output of Ascii85.decode
 will have the ASCII-8BIT encoding, so in Ruby 1.9 you may have to use
 <tt>String#force_encoding</tt> to correct the encoding.
 

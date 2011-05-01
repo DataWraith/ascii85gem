@@ -25,16 +25,16 @@ module Ascii85
   # a single long line. Otherwise #encode formats the output into lines
   # of length +wrap_lines+ (minimum is 2).
   #
-  #     Ascii85::encode("Ruby")
+  #     Ascii85.encode("Ruby")
   #     => <~;KZGo~>
   #
-  #     Ascii85::encode("Supercalifragilisticexpialidocious", 15)
+  #     Ascii85.encode("Supercalifragilisticexpialidocious", 15)
   #     => <~;g!%jEarNoBkD
   #        BoB5)0rF*),+AU&
   #        0.@;KXgDe!L"F`R
   #        ~>
   #
-  #     Ascii85::encode("Supercalifragilisticexpialidocious", false)
+  #     Ascii85.encode("Supercalifragilisticexpialidocious", false)
   #     => <~;g!%jEarNoBkDBoB5)0rF*),+AU&0.@;KXgDe!L"F`R~>
   #
   #
@@ -111,13 +111,13 @@ module Ascii85
   # ignore all characters outside these markers. The returned strings are always
   # encoded as ASCII-8BIT.
   #
-  #     Ascii85::decode("<~;KZGo~>")
+  #     Ascii85.decode("<~;KZGo~>")
   #     => "Ruby"
   #
-  #     Ascii85::decode("Foo<~;KZGo~>Bar<~;KZGo~>Baz")
+  #     Ascii85.decode("Foo<~;KZGo~>Bar<~;KZGo~>Baz")
   #     => "Ruby"
   #
-  #     Ascii85::decode("No markers")
+  #     Ascii85.decode("No markers")
   #     => ""
   #
   # #decode will raise Ascii85::DecodingError when malformed input is
@@ -220,7 +220,7 @@ module Ascii85
   end
 
   #
-  # This error is raised when Ascii85::decode encounters one of the following
+  # This error is raised when Ascii85.decode encounters one of the following
   # problems in the input:
   #
   # * An invalid character. Valid characters are '!'..'u' and 'z'.
