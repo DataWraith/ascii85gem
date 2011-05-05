@@ -6,11 +6,12 @@ Gem::Specification.new do |s|
   s.name        = "Ascii85"
   s.version     = Ascii85::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["TODO: Write your name"]
-  s.email       = ["TODO: Write your email address"]
-  s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.author      = "Johannes Holzfuß"
+  s.email       = "DataWraith@web.de"
+  s.license     = 'MIT'
+  s.homepage    = "http://ascii85.rubyforge.org/"
+  s.summary     = %q{Ascii85 encoder/decoder}
+  s.description = %q{Ascii85 provides methods to encode/decode Adobe's binary-to-text encoding of the same name.}
 
   s.rubyforge_project = "Ascii85"
 
