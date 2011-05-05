@@ -10,7 +10,7 @@
 # the format.
 #
 # Author::  Johannes Holzfuß (DataWraith@web.de)
-# License:: Distributed under the MIT License (see README.txt)
+# License:: Distributed under the MIT License (see README.rdoc)
 #
 
 
