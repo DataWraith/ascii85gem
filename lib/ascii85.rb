@@ -9,14 +9,12 @@
 # and http://en.wikipedia.org/wiki/Ascii85 for more information about
 # the format.
 #
-# Author::  Johannes Holzfuß (Drangon@gmx.de)
+# Author::  Johannes Holzfuß (DataWraith@web.de)
 # License:: Distributed under the MIT License (see README.txt)
 #
 
 
 module Ascii85
-  # The gem version number
-  VERSION = '1.0.0' # :nodoc:
 
   #
   # Encodes the bytes of the given String as Ascii85.

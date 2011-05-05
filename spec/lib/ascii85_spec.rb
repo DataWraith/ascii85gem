@@ -1,8 +1,6 @@
 # encoding: utf-8
 
-require 'spec_helper'
-
-require 'ascii85'
+require File.join(File.dirname(__FILE__), '..', 'spec_helper')
 
 describe Ascii85 do
 
@@ -110,15 +108,15 @@ describe Ascii85 do
 
   describe "#decode" do
 
-    it "should decode all specified test-cases correctly", :ruby => 1.9 do
-      TEST_CASES.each_pair do |decoded, input|
-        Ascii85.decode(input).should == decoded.dup.force_encoding('ASCII-8BIT')
-      end
-    end
-
     it "should decode all specified test-cases correctly", :ruby => 1.8 do
       TEST_CASES.each_pair do |decoded, input|
         Ascii85.decode(input).should == decoded
+      end
+    end
+
+    it "should decode all specified test-cases correctly", :ruby => 1.9 do
+      TEST_CASES.each_pair do |decoded, input|
+        Ascii85.decode(input).should == decoded.dup.force_encoding('ASCII-8BIT')
       end
     end
 

@@ -1,3 +1,0 @@
-module Ascii85
-  # Your code goes here...
-end

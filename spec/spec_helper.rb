@@ -1,9 +1,6 @@
 # encoding: utf-8
 
-require 'rspec'
-
-# Add lib/ to the path
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+require File.join(File.dirname(__FILE__), '..', 'lib', 'ascii85')
 
 RSpec.configure do |c|
   # Filter tests based on ruby version
