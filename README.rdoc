@@ -12,6 +12,11 @@ See http://www.adobe.com/products/postscript/pdfs/PLRM.pdf page 131 and
 http://en.wikipedia.org/wiki/Ascii85 for more information about the format.
 
 
+== INSTALLATION:
+
+* sudo gem install Ascii85
+
+
 == SYNOPSIS:
 
   require 'rubygems'
@@ -44,11 +49,6 @@ command-line:
         -d, --decode                     Decode the input
         -h, --help                       Display this help and exit
             --version                    Output version information
-
-
-== INSTALL:
-
-* sudo gem install Ascii85
 
 
 == LICENSE:
