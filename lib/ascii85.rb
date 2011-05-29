@@ -125,30 +125,27 @@ module Ascii85
 
     input = str.to_s
 
-    # Try to compile the regular expression for finding the input between
-    # the <~ and ~> delimiters. In order to work properly with different
-    # input encodings, the RegExp itself is re-encoded to the input encoding
-    # if possible. Thanks to Myrddin Emrys for suggesting this approach
-    # (http://is.gd/5x18O)
-    begin
-      regex = "<~(.*?)?~>"
+    opening_delim = '<~'
+    closing_delim = '~>'
 
-      if regex.respond_to?(:encode)
-        regex = regex.encode(input.encoding)
-      end
-      regex = Regexp.compile(regex, Regexp::MULTILINE)
-
-      # Find the actual data to be decoded
-      input = input.match(regex)
-
-    rescue EncodingError
-      raise ArgumentError, "Incompatible input encoding: #{str.encoding.inspect}"
+    # Make sure the delimiter strings have the correct encoding.
+    #
+    # Although I don't think it likely, this may raise encoding
+    # errors if an especially exotic input encoding is introduced.
+    # As of Ruby 1.9.2 all non-dummy encodings work fine though.
+    #
+    if opening_delim.respond_to?(:encode!)
+      opening_delim.encode!(input.encoding)
+      closing_delim.encode!(input.encoding)
     end
 
-    return '' if input.nil?
+    # Get the positions of the opening/closing delimiters. If there is
+    # no pair of opening/closing delimiters, return the empty string.
+    (start_pos = input.index(opening_delim))                or return ''
+    (end_pos   = input.index(closing_delim, start_pos + 2)) or return ''
 
-    # Get the matched data as String
-    input = input.captures.first
+    # Get the string inside the delimiter-pair
+    input = input[(start_pos + 2)...end_pos]
 
     # Decode
     word   = 0
