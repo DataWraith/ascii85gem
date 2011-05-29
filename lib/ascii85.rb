@@ -151,10 +151,9 @@ module Ascii85
     input = input.captures.first
 
     # Decode
+    word   = 0
+    count  = 0
     result = []
-
-    count = 0
-    word = 0
 
     input.each_byte do |c|
 
@@ -173,7 +172,7 @@ module Ascii85
 
       when '!'..'u'
         # Decode 5 characters into a 4-byte word
-        word += (c - 33) * 85**(4 - count)
+        word  += (c - 33) * 85**(4 - count)
         count += 1
 
         if count == 5
@@ -184,7 +183,8 @@ module Ascii85
           end
 
           result << word
-          word = 0
+
+          word  = 0
           count = 0
         end
 
@@ -207,7 +207,7 @@ module Ascii85
       end
 
       count -= 1
-      word += 85**(4 - count)
+      word  += 85**(4 - count)
 
       result << ((word >> 24) & 255).chr if count >= 1
       result << ((word >> 16) & 255).chr if count >= 2

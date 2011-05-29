@@ -42,7 +42,7 @@ describe Ascii85 do
     # Generate a random string
     test_str = ""
     (1 + rand(255)).times do
-      test_str += rand(256).chr
+      test_str << rand(256).chr
     end
 
     encoded = Ascii85.encode(test_str)
