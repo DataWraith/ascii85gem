@@ -159,7 +159,7 @@ module Ascii85
     input.each_byte do |c|
 
       case c.chr
-      when /[ \t\r\n\f\0]/
+      when " ", "\t", "\r", "\n", "\f", "\0"
         # Ignore whitespace
         next
 
