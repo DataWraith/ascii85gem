@@ -42,7 +42,7 @@ module Ascii85
     return '' if to_encode.empty?
 
     # Deal with multi-byte encodings
-    if to_encode.methods.include?(:bytesize)
+    if to_encode.respond_to?(:bytesize)
       input_size = to_encode.bytesize
     else
       input_size = to_encode.size
@@ -133,7 +133,7 @@ module Ascii85
     begin
       regex = "<~(.*?)?~>"
 
-      if regex.methods.include?(:encode)
+      if regex.respond_to?(:encode)
         regex = regex.encode(input.encoding)
       end
       regex = Regexp.compile(regex, Regexp::MULTILINE)
