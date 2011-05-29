@@ -139,11 +139,13 @@ describe Ascii85 do
     end
 
     it "should only process data within delimiters" do
-      Ascii85.decode("<~~>").should                       == ''
-      Ascii85.decode("Doesn't contain delimiters").should == ''
-      Ascii85.decode("FooBar<~z~>BazQux").should          == ("\0" * 4)
-      Ascii85.decode("<~;KZGo~><~z~>").should             == "Ruby"
-      Ascii85.decode("foo~>bar<~baz").should              == ''
+      Ascii85.decode("<~~>").should                         == ''
+      Ascii85.decode("Doesn't contain delimiters").should   == ''
+      Ascii85.decode("Mismatched ~>   delimiters 1").should == ''
+      Ascii85.decode("Mismatched <~   delimiters 2").should == ''
+      Ascii85.decode("Mismatched ~><~ delimiters 3").should == ''
+      Ascii85.decode("FooBar<~z~>BazQux").should            == ("\0" * 4)
+      Ascii85.decode("<~;KZGo~><~z~>").should               == "Ruby"
     end
 
     it "should ignore whitespace" do
