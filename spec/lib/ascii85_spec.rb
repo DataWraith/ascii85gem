@@ -137,7 +137,7 @@ describe Ascii85 do
 
         lambda {
           Ascii85.decode(to_test).force_encoding('UTF-8').must_equal input
-        }.should_not raise_error
+        }.must_be_silent
       end
     end
 
@@ -163,27 +163,19 @@ describe Ascii85 do
     describe "Error conditions" do
 
       it "should raise DecodingError if it encounters a word >= 2**32" do
-        lambda {
-          Ascii85.decode('<~s8W-#~>')
-        }.should raise_error Ascii85::DecodingError
+        lambda { Ascii85.decode('<~s8W-#~>') }.must_raise(Ascii85::DecodingError)
       end
 
       it "should raise DecodingError if it encounters an invalid character" do
-        lambda {
-          Ascii85.decode('<~!!y!!~>')
-        }.should raise_error Ascii85::DecodingError
+        lambda { Ascii85.decode('<~!!y!!~>') }.must_raise(Ascii85::DecodingError)
       end
 
       it "should raise DecodingError if the last tuple consists of a single character" do
-        lambda {
-          Ascii85.decode('<~!~>')
-        }.should raise_error Ascii85::DecodingError
+        lambda { Ascii85.decode('<~!~>') }.must_raise(Ascii85::DecodingError)
       end
 
       it "should raise DecodingError if a z is found inside a 5-tuple" do
-        lambda {
-          Ascii85.decode('<~!!z!!~>')
-        }.should raise_error Ascii85::DecodingError
+        lambda { Ascii85.decode('<~!!z!!~>') }.must_raise Ascii85::DecodingError
       end
 
     end
