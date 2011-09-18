@@ -7,6 +7,7 @@ require File.expand_path('../../../lib/ascii85', __FILE__)
 
 describe Ascii85 do
 
+  UNSUPPORTED_MSG = "This version of Ruby does not support encodings"
   TEST_CASES = {
 
     ""          => "",
@@ -62,7 +63,11 @@ describe Ascii85 do
       end
     end
 
-    it "should encode Strings in different encodings correctly", :ruby => 1.9 do
+    it "should encode Strings in different encodings correctly" do
+      unless String.new.respond_to?(:encoding)
+        skip(UNSUPPORTED_MSG)
+      end
+
       input_EUC_JP = 'どうもありがとうミスターロボット'.encode('EUC-JP')
       input_binary = input_EUC_JP.force_encoding('ASCII-8BIT')
 
@@ -111,19 +116,20 @@ describe Ascii85 do
 
   describe "#decode" do
 
-    it "should decode all specified test-cases correctly", :ruby => 1.8 do
+    it "should decode all specified test-cases correctly" do
       TEST_CASES.each_pair do |decoded, input|
-        Ascii85.decode(input).must_equal decoded
+        if String.new.respond_to?(:encoding)
+          Ascii85.decode(input).must_equal decoded.dup.force_encoding('ASCII-8BIT')
+        else
+          Ascii85.decode(input).must_equal decoded
+        end
       end
     end
 
-    it "should decode all specified test-cases correctly", :ruby => 1.9 do
-      TEST_CASES.each_pair do |decoded, input|
-        Ascii85.decode(input).must_equal decoded.dup.force_encoding('ASCII-8BIT')
+    it "should accept valid input in encodings other than the default" do
+      unless String.new.respond_to?(:encoding)
+        skip(UNSUPPORTED_MSG)
       end
-    end
-
-    it "should accept valid input in encodings other than the default", :ruby => 1.9 do
 
       input = "Ragnarök  τέχνη  русский язык  I ♥ Ruby"
       input_ascii85 = Ascii85.encode(input)
@@ -135,9 +141,7 @@ describe Ascii85 do
 
         to_test = input_ascii85.encode(encoding)
 
-        lambda {
-          Ascii85.decode(to_test).force_encoding('UTF-8').must_equal input
-        }.must_be_silent
+        Ascii85.decode(to_test).force_encoding('UTF-8').must_equal input
       end
     end
 
@@ -156,7 +160,11 @@ describe Ascii85 do
       decoded.must_equal 'Antidisestablishmentarianism'
     end
 
-    it "should return ASCII-8BIT encoded strings", :ruby => 1.9 do
+    it "should return ASCII-8BIT encoded strings" do
+      unless String.new.respond_to?(:encoding)
+        skip(UNSUPPORTED_MSG)
+      end
+
       Ascii85.decode("<~;KZGo~>").encoding.name.must_equal "ASCII-8BIT"
     end
 
