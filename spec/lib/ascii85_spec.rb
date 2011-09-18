@@ -82,7 +82,7 @@ describe Ascii85 do
       #
       # No wrap
       #
-      Ascii85.encode(test_str, false).count("\n").must_be :zero?
+      Ascii85.encode(test_str, false).count("\n").must_equal 0
 
       #
       # x characters per line, except for the last one
