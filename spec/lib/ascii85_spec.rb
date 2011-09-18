@@ -51,14 +51,14 @@ describe Ascii85 do
     encoded = Ascii85.encode(test_str)
     decoded = Ascii85.decode(encoded)
 
-    decoded.should == test_str
+    decoded.must_equal test_str
   end
 
   describe "#encode" do
 
     it "should encode all specified test-cases correctly" do
       TEST_CASES.each_pair do |input, encoded|
-        Ascii85.encode(input).should == encoded
+        Ascii85.encode(input).must_equal encoded
       end
     end
 
@@ -66,7 +66,7 @@ describe Ascii85 do
       input_EUC_JP = 'どうもありがとうミスターロボット'.encode('EUC-JP')
       input_binary = input_EUC_JP.force_encoding('ASCII-8BIT')
 
-      Ascii85.encode(input_EUC_JP).should == Ascii85.encode(input_binary)
+      Ascii85.encode(input_EUC_JP).must_equal Ascii85.encode(input_binary)
     end
 
     it "should produce output lines no longer than specified" do
@@ -75,7 +75,7 @@ describe Ascii85 do
       #
       # No wrap
       #
-      Ascii85.encode(test_str, false).count("\n").should == 0
+      Ascii85.encode(test_str, false).count("\n").must_equal 0
 
       #
       # x characters per line, except for the last one
@@ -100,11 +100,11 @@ describe Ascii85 do
       count_arr.delete_if { |len| len == x }
 
       # Now count_arr should be empty
-      count_arr.should be_empty
+      count_arr.must_be_empty
     end
 
     it "should not split the end-marker to achieve correct line length" do
-      Ascii85.encode("\0" * 4, 4).should == "<~z\n~>"
+      Ascii85.encode("\0" * 4, 4).must_equal "<~z\n~>"
     end
 
   end
@@ -113,13 +113,13 @@ describe Ascii85 do
 
     it "should decode all specified test-cases correctly", :ruby => 1.8 do
       TEST_CASES.each_pair do |decoded, input|
-        Ascii85.decode(input).should == decoded
+        Ascii85.decode(input).must_equal decoded
       end
     end
 
     it "should decode all specified test-cases correctly", :ruby => 1.9 do
       TEST_CASES.each_pair do |decoded, input|
-        Ascii85.decode(input).should == decoded.dup.force_encoding('ASCII-8BIT')
+        Ascii85.decode(input).must_equal decoded.dup.force_encoding('ASCII-8BIT')
       end
     end
 
@@ -136,28 +136,28 @@ describe Ascii85 do
         to_test = input_ascii85.encode(encoding)
 
         lambda {
-          Ascii85.decode(to_test).force_encoding('UTF-8').should == input
+          Ascii85.decode(to_test).force_encoding('UTF-8').must_equal input
         }.should_not raise_error
       end
     end
 
     it "should only process data within delimiters" do
-      Ascii85.decode("<~~>").should                         == ''
-      Ascii85.decode("Doesn't contain delimiters").should   == ''
-      Ascii85.decode("Mismatched ~>   delimiters 1").should == ''
-      Ascii85.decode("Mismatched <~   delimiters 2").should == ''
-      Ascii85.decode("Mismatched ~><~ delimiters 3").should == ''
-      Ascii85.decode("FooBar<~z~>BazQux").should            == ("\0" * 4)
-      Ascii85.decode("<~;KZGo~><~z~>").should               == "Ruby"
+      Ascii85.decode("<~~>").must_equal                         ''
+      Ascii85.decode("Doesn't contain delimiters").must_equal   ''
+      Ascii85.decode("Mismatched ~>   delimiters 1").must_equal ''
+      Ascii85.decode("Mismatched <~   delimiters 2").must_equal ''
+      Ascii85.decode("Mismatched ~><~ delimiters 3").must_equal ''
+      Ascii85.decode("FooBar<~z~>BazQux").must_equal            ("\0" * 4)
+      Ascii85.decode("<~;KZGo~><~z~>").must_equal               "Ruby"
     end
 
     it "should ignore whitespace" do
       decoded = Ascii85.decode("<~6   #LdYA\r\08\n  \n\n- *rF*(i\"Ch[s \t(D.RU,@ <-\'jDJ=0\f/~>")
-      decoded.should == 'Antidisestablishmentarianism'
+      decoded.must_equal 'Antidisestablishmentarianism'
     end
 
     it "should return ASCII-8BIT encoded strings", :ruby => 1.9 do
-      Ascii85.decode("<~;KZGo~>").encoding.name.should == "ASCII-8BIT"
+      Ascii85.decode("<~;KZGo~>").encoding.name.must_equal "ASCII-8BIT"
     end
 
     describe "Error conditions" do
