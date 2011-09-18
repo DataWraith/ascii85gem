@@ -8,4 +8,5 @@ Rake::TestTask.new do |t|
 end
 
 task :specs   => :test
+task :tests   => :test
 task :default => :test
