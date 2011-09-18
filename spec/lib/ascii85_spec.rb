@@ -9,6 +9,7 @@ require File.expand_path('../../../lib/ascii85', __FILE__)
 describe Ascii85 do
 
   UNSUPPORTED_MSG = "This version of Ruby does not support encodings"
+
   TEST_CASES = {
 
     ""          => "",
@@ -81,7 +82,7 @@ describe Ascii85 do
       #
       # No wrap
       #
-      Ascii85.encode(test_str, false).count("\n").must_equal 0
+      Ascii85.encode(test_str, false).count("\n").must_be :zero?
 
       #
       # x characters per line, except for the last one
@@ -147,13 +148,14 @@ describe Ascii85 do
     end
 
     it "should only process data within delimiters" do
-      Ascii85.decode("<~~>").must_equal                         ''
-      Ascii85.decode("Doesn't contain delimiters").must_equal   ''
-      Ascii85.decode("Mismatched ~>   delimiters 1").must_equal ''
-      Ascii85.decode("Mismatched <~   delimiters 2").must_equal ''
-      Ascii85.decode("Mismatched ~><~ delimiters 3").must_equal ''
-      Ascii85.decode("FooBar<~z~>BazQux").must_equal            ("\0" * 4)
-      Ascii85.decode("<~;KZGo~><~z~>").must_equal               "Ruby"
+      Ascii85.decode("<~~>").must_be_empty
+      Ascii85.decode("Doesn't contain delimiters").must_be_empty
+      Ascii85.decode("Mismatched ~>   delimiters 1").must_be_empty
+      Ascii85.decode("Mismatched <~   delimiters 2").must_be_empty
+      Ascii85.decode("Mismatched ~><~ delimiters 3").must_be_empty
+
+      Ascii85.decode("<~;KZGo~><~z~>").must_equal    "Ruby"
+      Ascii85.decode("FooBar<~z~>BazQux").must_equal "\0\0\0\0"
     end
 
     it "should ignore whitespace" do
