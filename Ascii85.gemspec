@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "Ascii85"
 
   s.add_development_dependency "bundler", ">= 1.0.0"
-  s.add_development_dependency "rspec",   ">= 2.4.0"
+  s.add_development_dependency "minitest",">= 2.6.0"
 
   s.files            = `git ls-files`.split("\n")
   s.test_files       = `git ls-files -- spec/*`.split("\n")
