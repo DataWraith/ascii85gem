@@ -1,6 +1,9 @@
 # encoding: utf-8
 
-require File.join(File.dirname(__FILE__), '..', 'spec_helper')
+require 'minitest/autorun'
+
+# Require implementation
+require File.expand_path('../../../lib/ascii85', __FILE__)
 
 describe Ascii85 do
 
