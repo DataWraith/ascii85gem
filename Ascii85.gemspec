@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "bundler", ">= 1.0.0"
   s.add_development_dependency "minitest",">= 2.6.0"
 
-  s.files            = `git ls-files`.split("\n")
+  s.files            = `git ls-files`.split("\n") - ['.gitignore']
   s.test_files       = `git ls-files -- spec/*`.split("\n")
   s.executables      = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths    = ["lib"]
