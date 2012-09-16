@@ -140,10 +140,19 @@ describe Ascii85 do
       # do the right thing in #decode.
       Encoding.list.each do |encoding|
         next if encoding.dummy?
+        next unless encoding.ascii_compatible?
 
-        to_test = input_ascii85.encode(encoding)
+        # CP949 is a Microsoft Codepage for Korean, which apparently does not
+        # include a backslash, even though #ascii_compatible? returns true. This
+        # leads to an Ascii85::DecodingError, so we simply skip the encoding.
+        next if encoding.name == "CP949"
 
-        Ascii85.decode(to_test).force_encoding('UTF-8').must_equal input
+        begin
+          to_test = input_ascii85.encode(encoding)
+          Ascii85.decode(to_test).force_encoding('UTF-8').must_equal input
+        rescue Encoding::ConverterNotFoundError
+          # Ignore this encoding
+        end
       end
     end
 
