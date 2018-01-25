@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = Ascii85::VERSION
   s.platform    = Gem::Platform::RUBY
   s.author      = "Johannes Holzfuß"
-  s.email       = "DataWraith@web.de"
+  s.email       = "johannes@holzfuss.name"
   s.license     = 'MIT'
   s.homepage    = "https://github.com/DataWraith/ascii85gem/"
   s.summary     = %q{Ascii85 encoder/decoder}
