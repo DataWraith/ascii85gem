@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.author      = "Johannes Holzfuß"
   s.email       = "DataWraith@web.de"
   s.license     = 'MIT'
-  s.homepage    = "http://rubyforge.org/projects/ascii85/"
+  s.homepage    = "https://github.com/DataWraith/ascii85gem/"
   s.summary     = %q{Ascii85 encoder/decoder}
   s.description = %q{Ascii85 provides methods to encode/decode Adobe's binary-to-text encoding of the same name.}
 
