@@ -1,3 +1,7 @@
+=== 1.0.3 / 2018-01-25
+
+  * Updated the gem's metadata
+
 === 1.0.2 / 2012-09-16
 
   * Changed test runner from RSpec to MiniSpec
