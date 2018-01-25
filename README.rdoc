@@ -2,8 +2,6 @@
 
 = Ascii85
 
-* http://rubyforge.org/projects/ascii85
-
 
 == Description
 
