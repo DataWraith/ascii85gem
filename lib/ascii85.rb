@@ -9,7 +9,7 @@
 # and http://en.wikipedia.org/wiki/Ascii85 for more information about
 # the format.
 #
-# Author::  Johannes Holzfuß (DataWraith@web.de)
+# Author::  Johannes Holzfuß (johannes@holzfuss.name)
 # License:: Distributed under the MIT License (see LICENSE file)
 #
 
