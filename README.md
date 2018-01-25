@@ -32,7 +32,7 @@ Ascii85.decode("<~;KZGo~>")
 ```
 
 In addition, Ascii85.encode can take a second parameter that specifies the
-length of the returned lines. The default is 80; use +false+ for unlimited.
+length of the returned lines. The default is 80; use `false` for unlimited.
 
 Ascii85.decode expects the input to be enclosed in <~ and ~> — it
 ignores everything outside of these. The output of Ascii85.decode
@@ -42,7 +42,7 @@ will have the ASCII-8BIT encoding, so in Ruby 1.9 you may have to use
 
 ## Command-line utility
 
-This gem includes +ascii85+, a command-line utility modeled after +base64+ from
+This gem includes `ascii85`, a command-line utility modeled after `base64` from
 the GNU coreutils. It can be used to encode/decode Ascii85 directly from the
 command-line:
 
