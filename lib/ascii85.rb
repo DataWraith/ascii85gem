@@ -60,7 +60,7 @@ module Ascii85
       if tuple == 0
         'z'
       else
-        tmp = +""
+        tmp = String.new("")
         5.times do
           tmp << ((tuple % 85) + 33).chr
           tuple /= 85

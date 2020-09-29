@@ -46,7 +46,7 @@ describe Ascii85 do
   it "#decode should be the inverse of #encode" do
 
     # Generate a random string
-    test_str = +""
+    test_str = String.new("")
     (1 + rand(255)).times do
       test_str << rand(256).chr
     end
