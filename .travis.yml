@@ -25,3 +25,6 @@ matrix:
       env: RUBYOPT="--enable-frozen-string-literal"
     - rvm: 2.2
       env: RUBYOPT="--enable-frozen-string-literal"
+    # bundler did not support this back then
+    - rvm: 2.3
+      env: RUBYOPT="--enable-frozen-string-literal"
