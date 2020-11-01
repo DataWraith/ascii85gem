@@ -46,7 +46,7 @@ describe Ascii85 do
   it "#decode should be the inverse of #encode" do
 
     # Generate a random string
-    test_str = ""
+    test_str = String.new("")
     (1 + rand(255)).times do
       test_str << rand(256).chr
     end
@@ -54,14 +54,14 @@ describe Ascii85 do
     encoded = Ascii85.encode(test_str)
     decoded = Ascii85.decode(encoded)
 
-    decoded.must_equal test_str
+    assert_equal decoded, test_str
   end
 
   describe "#encode" do
 
     it "should encode all specified test-cases correctly" do
       TEST_CASES.each_pair do |input, encoded|
-        Ascii85.encode(input).must_equal encoded
+        assert_equal Ascii85.encode(input), encoded
       end
     end
 
@@ -73,7 +73,7 @@ describe Ascii85 do
       input_EUC_JP = 'どうもありがとうミスターロボット'.encode('EUC-JP')
       input_binary = input_EUC_JP.force_encoding('ASCII-8BIT')
 
-      Ascii85.encode(input_EUC_JP).must_equal Ascii85.encode(input_binary)
+      assert_equal Ascii85.encode(input_EUC_JP), Ascii85.encode(input_binary)
     end
 
     it "should produce output lines no longer than specified" do
@@ -82,7 +82,7 @@ describe Ascii85 do
       #
       # No wrap
       #
-      Ascii85.encode(test_str, false).count("\n").must_equal 0
+      assert_equal Ascii85.encode(test_str, false).count("\n"), 0
 
       #
       # x characters per line, except for the last one
@@ -107,11 +107,11 @@ describe Ascii85 do
       count_arr.delete_if { |len| len == x }
 
       # Now count_arr should be empty
-      count_arr.must_be_empty
+      assert_empty count_arr
     end
 
     it "should not split the end-marker to achieve correct line length" do
-      Ascii85.encode("\0" * 4, 4).must_equal "<~z\n~>"
+      assert_equal Ascii85.encode("\0" * 4, 4), "<~z\n~>"
     end
 
   end
@@ -121,9 +121,9 @@ describe Ascii85 do
     it "should decode all specified test-cases correctly" do
       TEST_CASES.each_pair do |decoded, input|
         if String.new.respond_to?(:encoding)
-          Ascii85.decode(input).must_equal decoded.dup.force_encoding('ASCII-8BIT')
+          assert_equal Ascii85.decode(input), decoded.dup.force_encoding('ASCII-8BIT')
         else
-          Ascii85.decode(input).must_equal decoded
+          assert_equal Ascii85.decode(input), decoded
         end
       end
     end
@@ -149,7 +149,7 @@ describe Ascii85 do
 
         begin
           to_test = input_ascii85.encode(encoding)
-          Ascii85.decode(to_test).force_encoding('UTF-8').must_equal input
+          assert_equal Ascii85.decode(to_test).force_encoding('UTF-8'), input
         rescue Encoding::ConverterNotFoundError
           # Ignore this encoding
         end
@@ -157,19 +157,19 @@ describe Ascii85 do
     end
 
     it "should only process data within delimiters" do
-      Ascii85.decode("<~~>").must_be_empty
-      Ascii85.decode("Doesn't contain delimiters").must_be_empty
-      Ascii85.decode("Mismatched ~>   delimiters 1").must_be_empty
-      Ascii85.decode("Mismatched <~   delimiters 2").must_be_empty
-      Ascii85.decode("Mismatched ~><~ delimiters 3").must_be_empty
+      assert_empty Ascii85.decode("<~~>")
+      assert_empty Ascii85.decode("Doesn't contain delimiters")
+      assert_empty Ascii85.decode("Mismatched ~>   delimiters 1")
+      assert_empty Ascii85.decode("Mismatched <~   delimiters 2")
+      assert_empty Ascii85.decode("Mismatched ~><~ delimiters 3")
 
-      Ascii85.decode("<~;KZGo~><~z~>").must_equal    "Ruby"
-      Ascii85.decode("FooBar<~z~>BazQux").must_equal "\0\0\0\0"
+      assert_equal Ascii85.decode("<~;KZGo~><~z~>"),    "Ruby"
+      assert_equal Ascii85.decode("FooBar<~z~>BazQux"), "\0\0\0\0"
     end
 
     it "should ignore whitespace" do
       decoded = Ascii85.decode("<~6   #LdYA\r\08\n  \n\n- *rF*(i\"Ch[s \t(D.RU,@ <-\'jDJ=0\f/~>")
-      decoded.must_equal 'Antidisestablishmentarianism'
+      assert_equal decoded, 'Antidisestablishmentarianism'
     end
 
     it "should return ASCII-8BIT encoded strings" do
@@ -177,25 +177,25 @@ describe Ascii85 do
         skip(UNSUPPORTED_MSG)
       end
 
-      Ascii85.decode("<~;KZGo~>").encoding.name.must_equal "ASCII-8BIT"
+      assert_equal Ascii85.decode("<~;KZGo~>").encoding.name, "ASCII-8BIT"
     end
 
     describe "Error conditions" do
 
       it "should raise DecodingError if it encounters a word >= 2**32" do
-        lambda { Ascii85.decode('<~s8W-#~>') }.must_raise(Ascii85::DecodingError)
+        assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~s8W-#~>') }
       end
 
       it "should raise DecodingError if it encounters an invalid character" do
-        lambda { Ascii85.decode('<~!!y!!~>') }.must_raise(Ascii85::DecodingError)
+        assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~!!y!!~>') }
       end
 
       it "should raise DecodingError if the last tuple consists of a single character" do
-        lambda { Ascii85.decode('<~!~>') }.must_raise(Ascii85::DecodingError)
+        assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~!~>') }
       end
 
       it "should raise DecodingError if a z is found inside a 5-tuple" do
-        lambda { Ascii85.decode('<~!!z!!~>') }.must_raise Ascii85::DecodingError
+        assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~!!z!!~>') }
       end
 
     end

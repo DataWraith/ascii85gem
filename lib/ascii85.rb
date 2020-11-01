@@ -1,4 +1,5 @@
 # encoding: utf-8
+# frozen_string_literal: true
 
 
 #
@@ -59,7 +60,7 @@ module Ascii85
       if tuple == 0
         'z'
       else
-        tmp = ""
+        tmp = String.new("")
         5.times do
           tmp << ((tuple % 85) + 33).chr
           tuple /= 85
@@ -134,9 +135,9 @@ module Ascii85
     # errors if an especially exotic input encoding is introduced.
     # As of Ruby 1.9.2 all non-dummy encodings work fine though.
     #
-    if opening_delim.respond_to?(:encode!)
-      opening_delim.encode!(input.encoding)
-      closing_delim.encode!(input.encoding)
+    if opening_delim.respond_to?(:encode)
+      opening_delim = opening_delim.encode(input.encoding)
+      closing_delim = closing_delim.encode(input.encoding)
     end
 
     # Get the positions of the opening/closing delimiters. If there is
