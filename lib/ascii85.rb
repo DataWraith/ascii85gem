@@ -16,7 +16,6 @@
 
 
 module Ascii85
-
   #
   # Encodes the bytes of the given String as Ascii85.
   #
@@ -38,7 +37,6 @@ module Ascii85
   #
   #
   def self.encode(str, wrap_lines = 80)
-
     to_encode = str.to_s
     return '' if to_encode.empty?
 
@@ -83,7 +81,6 @@ module Ascii85
     end
 
     # Otherwise we wrap the lines
-
     line_length = [2, wrap_lines.to_i].max
 
     wrapped = []
@@ -123,7 +120,6 @@ module Ascii85
   # encountered.
   #
   def self.decode(str)
-
     input = str.to_s
 
     opening_delim = '<~'
@@ -154,7 +150,6 @@ module Ascii85
     result = []
 
     input.each_byte do |c|
-
       case c.chr
       when " ", "\t", "\r", "\n", "\f", "\0"
         # Ignore whitespace
@@ -190,7 +185,6 @@ module Ascii85
         raise(Ascii85::DecodingError,
               "Illegal character inside Ascii85: #{c.chr.dump}")
       end
-
     end
 
     # Convert result into a String
@@ -226,5 +220,4 @@ module Ascii85
   #   at least two characters.
   #
   class DecodingError < StandardError; end
-
 end

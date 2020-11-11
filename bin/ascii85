@@ -51,7 +51,6 @@ ARGV.options do |opts|
   else
     abort "Superfluous operand(s): \"#{remaining_args.join('", "')}\""
   end
-
 end
 
 if @options[:file] == '-'

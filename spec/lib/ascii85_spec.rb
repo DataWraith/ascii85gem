@@ -7,11 +7,9 @@ require 'minitest/autorun'
 require File.expand_path('../../../lib/ascii85', __FILE__)
 
 describe Ascii85 do
-
   UNSUPPORTED_MSG = "This version of Ruby does not support encodings"
 
   TEST_CASES = {
-
     ""          => "",
     " "         => "<~+9~>",
 
@@ -44,7 +42,6 @@ describe Ascii85 do
   }
 
   it "#decode should be the inverse of #encode" do
-
     # Generate a random string
     test_str = String.new
     (1 + rand(255)).times do
@@ -58,7 +55,6 @@ describe Ascii85 do
   end
 
   describe "#encode" do
-
     it "should encode all specified test-cases correctly" do
       TEST_CASES.each_pair do |input, encoded|
         assert_equal Ascii85.encode(input), encoded
@@ -113,11 +109,9 @@ describe Ascii85 do
     it "should not split the end-marker to achieve correct line length" do
       assert_equal Ascii85.encode("\0" * 4, 4), "<~z\n~>"
     end
-
   end
 
   describe "#decode" do
-
     it "should decode all specified test-cases correctly" do
       TEST_CASES.each_pair do |decoded, input|
         if String.new.respond_to?(:encoding)
@@ -181,7 +175,6 @@ describe Ascii85 do
     end
 
     describe "Error conditions" do
-
       it "should raise DecodingError if it encounters a word >= 2**32" do
         assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~s8W-#~>') }
       end
@@ -197,9 +190,6 @@ describe Ascii85 do
       it "should raise DecodingError if a z is found inside a 5-tuple" do
         assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~!!z!!~>') }
       end
-
     end
-
   end
-
 end
