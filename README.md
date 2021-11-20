@@ -2,8 +2,6 @@
 
 # Ascii85
 
-[![Build Status](https://travis-ci.org/DataWraith/ascii85gem.svg?branch=master)](https://travis-ci.org/DataWraith/ascii85gem)
-
 ## Description
 
 Ascii85 is a simple gem that provides methods for encoding/decoding Adobe's
