@@ -7,7 +7,7 @@
 Ascii85 is a simple gem that provides methods for encoding/decoding Adobe's
 binary-to-text encoding of the same name.
 
-See http://www.adobe.com/products/postscript/pdfs/PLRM.pdf page 131 and
+See https://www.adobe.com/jp/print/postscript/pdfs/PLRM.pdf page 131 and
 http://en.wikipedia.org/wiki/Ascii85 for more information about the format.
 
 
