@@ -54,13 +54,6 @@ Encodes or decodes FILE or STDIN using Ascii85 and writes to STDOUT.
 ```
 
 
-## Contributors
-
-Thank you for your contribution!
-
-* [@aliismayilov](https://github.com/aliismayilov) contributed frozen String handling
-
-
 ## License
 
 Ascii85 is distributed under the MIT License. See the accompanying LICENSE file
