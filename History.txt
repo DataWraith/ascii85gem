@@ -1,10 +1,10 @@
 === 1.1.1 / 2024-04-28
 
-  * Make `bin/ascii85` Ruby 3.2-compatible
+  * Make `bin/ascii85` Ruby 3.2-compatible (thanks @tylerwillingham)
 
 === 1.1.0 / 2020-11-11
 
-  * Make use of frozen_string_literal
+  * Make use of frozen_string_literal (thanks @aliismayilov)
   * Update tests to use newer minitest syntax
 
 === 1.0.3 / 2018-01-25
