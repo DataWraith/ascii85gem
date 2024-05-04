@@ -53,6 +53,14 @@ ARGV.options do |opts|
   end
 end
 
+# When opt_parse fails, it will raise an Exception that prints an error message,
+# but the program will continue running. However, @options[:file] will not be
+# set, so we can detect this condition and simply exit with an error status
+# code while OptParse prints out the error message.
+if @options[:file].nil?
+  exit 1
+end
+
 if @options[:file] == '-'
   @input = $stdin.binmode.read
 else
