@@ -1,6 +1,7 @@
-=== 1.1.1 / 2024-04-28
+=== 1.1.1 / Unreleased
 
   * Make `bin/ascii85` Ruby 3.2-compatible (thanks @tylerwillingham)
+  * Improve error handling of `bin/ascii85` slightly
 
 === 1.1.0 / 2020-11-11
 
