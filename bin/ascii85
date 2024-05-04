@@ -9,6 +9,7 @@
 
 require "optparse"
 require File.join(File.dirname(__FILE__), '..', 'lib', 'ascii85')
+require File.join(File.dirname(__FILE__), '..', 'lib', 'Ascii85', 'version')
 
 @options = {
   :wrap   => 80,
