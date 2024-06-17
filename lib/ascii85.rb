@@ -38,14 +38,9 @@ module Ascii85
   #
   def self.encode(str, wrap_lines = 80)
     to_encode = str.to_s
-    return '' if to_encode.empty?
+    input_size = to_encode.bytesize
 
-    # Deal with multi-byte encodings
-    if to_encode.respond_to?(:bytesize)
-      input_size = to_encode.bytesize
-    else
-      input_size = to_encode.size
-    end
+    return '' if input_size.zero?
 
     # Compute number of \0s to pad the message with (0..3)
     padding_length = (-input_size) % 4
