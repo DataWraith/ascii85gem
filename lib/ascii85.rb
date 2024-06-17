@@ -147,6 +147,9 @@ module Ascii85
     # Get the string inside the delimiter-pair
     input = input[(start_pos + 2)...end_pos]
 
+    # Populate the lookup table (caches the exponentiation)
+    lut = (0..4).map { |count| 85 ** (4 - count) }
+
     # Decode
     word   = 0
     count  = 0
@@ -168,7 +171,7 @@ module Ascii85
 
       when '!'..'u'
         # Decode 5 characters into a 4-byte word
-        word  += (c - 33) * 85**(4 - count)
+        word  += (c - 33) * lut[count]
         count += 1
 
         if count == 5
@@ -202,7 +205,7 @@ module Ascii85
       end
 
       count -= 1
-      word  += 85**(4 - count)
+      word  += lut[count]
 
       result << ((word >> 24) & 255).chr if count >= 1
       result << ((word >> 16) & 255).chr if count >= 2
