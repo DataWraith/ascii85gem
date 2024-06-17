@@ -7,8 +7,6 @@ require 'minitest/autorun'
 require File.expand_path('../../../lib/ascii85', __FILE__)
 
 describe Ascii85 do
-  UNSUPPORTED_MSG = "This version of Ruby does not support encodings"
-
   TEST_CASES = {
     ""          => "",
     " "         => "<~+9~>",
@@ -62,10 +60,6 @@ describe Ascii85 do
     end
 
     it "should encode Strings in different encodings correctly" do
-      unless String.new.respond_to?(:encoding)
-        skip(UNSUPPORTED_MSG)
-      end
-
       input_EUC_JP = 'どうもありがとうミスターロボット'.encode('EUC-JP')
       input_binary = input_EUC_JP.force_encoding('ASCII-8BIT')
 
@@ -123,10 +117,6 @@ describe Ascii85 do
     end
 
     it "should accept valid input in encodings other than the default" do
-      unless String.new.respond_to?(:encoding)
-        skip(UNSUPPORTED_MSG)
-      end
-
       input = "Ragnarök  τέχνη  русский язык  I ♥ Ruby"
       input_ascii85 = Ascii85.encode(input)
 
@@ -167,10 +157,6 @@ describe Ascii85 do
     end
 
     it "should return ASCII-8BIT encoded strings" do
-      unless String.new.respond_to?(:encoding)
-        skip(UNSUPPORTED_MSG)
-      end
-
       assert_equal Ascii85.decode("<~;KZGo~>").encoding.name, "ASCII-8BIT"
     end
 
