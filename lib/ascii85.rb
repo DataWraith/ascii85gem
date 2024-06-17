@@ -46,7 +46,13 @@ module Ascii85
     padding_length = (-input_size) % 4
 
     # Extract big-endian integers
-    tuples = (to_encode + ("\0" * padding_length)).unpack('N*')
+    tuples = to_encode.unpack('N*')
+
+    if padding_length != 0
+      trailing = to_encode[-(4 - padding_length)..]
+      padding = "\0" * padding_length
+      tuples << (trailing + padding).unpack1('N')
+    end
 
     # Encode
     tuples.map! do |tuple|
