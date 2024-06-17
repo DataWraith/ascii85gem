@@ -59,12 +59,14 @@ module Ascii85
       if tuple == 0
         'z'
       else
-        tmp = String.new
-        5.times do
-          tmp << ((tuple % 85) + 33).chr
+        tmp = '!!!!!'.dup
+
+        5.times do |i|
+          tmp.setbyte(4 - i, (tuple % 85) + 33)
           tuple /= 85
         end
-        tmp.reverse
+
+        tmp
       end
     end
 
