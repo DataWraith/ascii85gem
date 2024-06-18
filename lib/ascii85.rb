@@ -103,40 +103,23 @@ module Ascii85
   end
 
   #
-  # Searches through +str+ and decodes the _first_ Ascii85-String found.
+  # Searches through +str+ and extracts the _first_ Ascii85-String delimited
+  # by +<~+ and +~>+.
   #
-  # #decode expects an Ascii85-encoded String enclosed in <~ and ~> — it will
-  # ignore all characters outside these markers. The returned strings are always
-  # encoded as ASCII-8BIT.
+  # Returns the empty String if no valid delimiters are found.
   #
-  #     Ascii85.decode("<~;KZGo~>")
-  #     => "Ruby"
+  #     Ascii85.extract("Foo<~;KZGo~>Bar<~z~>Baz")
+  #     => ";KZGo"
   #
-  #     Ascii85.decode("Foo<~;KZGo~>Bar<~;KZGo~>Baz")
-  #     => "Ruby"
-  #
-  #     Ascii85.decode("No markers")
+  #     Ascii85.extract("No delimiters")
   #     => ""
   #
-  # #decode will raise Ascii85::DecodingError when malformed input is
-  # encountered.
-  #
-  def self.decode(str)
+  def self.extract(str)
     input = str.to_s
 
-    opening_delim = '<~'
-    closing_delim = '~>'
-
     # Make sure the delimiter strings have the correct encoding.
-    #
-    # Although I don't think it likely, this may raise encoding
-    # errors if an especially exotic input encoding is introduced.
-    # As of Ruby 1.9.2 all non-dummy encodings work fine though.
-    #
-    if opening_delim.respond_to?(:encode)
-      opening_delim = opening_delim.encode(input.encoding)
-      closing_delim = closing_delim.encode(input.encoding)
-    end
+    opening_delim = '<~'.encode(input.encoding)
+    closing_delim = '~>'.encode(input.encoding)
 
     # Get the positions of the opening/closing delimiters. If there is
     # no pair of opening/closing delimiters, return the empty string.
@@ -144,7 +127,13 @@ module Ascii85
     (end_pos   = input.index(closing_delim, start_pos + 2)) or return ''
 
     # Get the string inside the delimiter-pair
-    input = input[(start_pos + 2)...end_pos]
+    input[(start_pos + 2)...end_pos]
+  end
+
+  def self.decode(str)
+    input = self.extract(str)
+
+    return input if input.empty?
 
     # Populate the lookup table (caches the exponentiation)
     lut = (0..4).map { |count| 85 ** (4 - count) }
