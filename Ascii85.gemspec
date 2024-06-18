@@ -13,6 +13,8 @@ Gem::Specification.new do |s|
   s.summary     = %q{Ascii85 encoder/decoder}
   s.description = %q{Ascii85 provides methods to encode/decode Adobe's binary-to-text encoding of the same name.}
 
+  s.required_ruby_version = ">= 2.7.0"
+
   s.add_development_dependency "bundler", ">= 1.0.0"
   s.add_development_dependency "minitest",">= 2.6.0"
   s.add_development_dependency "rake",    ">= 0.9.2"
