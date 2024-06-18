@@ -21,7 +21,6 @@ and https://en.wikipedia.org/wiki/Ascii85 for more information about the format.
 ## Usage
 
 ```
-require 'rubygems'
 require 'ascii85'
 
 Ascii85.encode("Ruby")
