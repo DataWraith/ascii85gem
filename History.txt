@@ -1,3 +1,9 @@
+=== 2.0.0 / Unreleased
+
+BREAKING CHANGES:
+
+  * The minimum required Ruby version has been raised to 2.7.0
+
 === 1.1.1 / 2024-05-09
 
   * Make `bin/ascii85` Ruby 3.2-compatible (thanks @tylerwillingham)
