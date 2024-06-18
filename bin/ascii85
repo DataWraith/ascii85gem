@@ -72,9 +72,7 @@ else
     abort "File is not readable: \"#{@options[:file]}\""
   end
 
-  File.open(@options[:file], 'rb') do |f|
-    @input = f.read
-  end
+  @input = File.binread(@options[:file])
 end
 
 if @options[:decode]
