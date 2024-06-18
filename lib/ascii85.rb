@@ -195,23 +195,22 @@ module Ascii85
     # Convert result into a String
     result = result.pack('N*')
 
-    if count > 0
-      # Finish last, partially decoded 32-bit-word
+    # We're done if all 5-tuples have been consumed
+    return result if count.zero?
 
-      if count == 1
-        raise(Ascii85::DecodingError,
-              "Last 5-tuple consists of single character")
-      end
-
-      count -= 1
-      word  += lut[count]
-
-      result << ((word >> 24) & 255).chr if count >= 1
-      result << ((word >> 16) & 255).chr if count >= 2
-      result << ((word >>  8) & 255).chr if count == 3
+    if count == 1
+      raise(Ascii85::DecodingError, "Last 5-tuple consists of single character")
     end
 
-    return result
+    # Finish last, partially decoded 32-bit-word
+    count -= 1
+    word  += lut[count]
+
+    result << ((word >> 24) & 255).chr if count >= 1
+    result << ((word >> 16) & 255).chr if count >= 2
+    result << ((word >>  8) & 255).chr if count == 3
+
+    result
   end
 
   #
