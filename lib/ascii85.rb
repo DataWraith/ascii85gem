@@ -159,8 +159,7 @@ module Ascii85
   # encountered.
   #
   def self.decode(str)
-    input = extract(str)
-    decode_raw(input)
+    decode_raw(extract(str))
   end
 
   #
