@@ -79,9 +79,10 @@ module Ascii85
 
     wrapped = '<~'.dup
     cur_len = 2
-    buffer  = tuples.shift
+    idx     = 0
+    buffer  = tuples.first
 
-    until tuples.empty? && buffer.nil?
+    until idx >= tuples.size && buffer.nil?
       # Line is full -> Linebreak
       if cur_len == line_length
         wrapped << "\n"
@@ -93,7 +94,8 @@ module Ascii85
       if cur_len + buffer.bytesize <= line_length
         wrapped << buffer
         cur_len += buffer.bytesize
-        buffer = tuples.shift
+        idx += 1
+        buffer = tuples[idx]
         next
       end
 
