@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-$LOAD_PATH.push File.expand_path('lib', __dir__)
-require 'Ascii85/version'
+require_relative 'lib/Ascii85/version'
 
 Gem::Specification.new do |s|
   s.name        = 'Ascii85'
