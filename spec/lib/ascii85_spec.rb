@@ -121,11 +121,7 @@ describe Ascii85 do
   describe '#decode' do
     it 'should decode all specified test-cases correctly' do
       TEST_CASES.each_pair do |decoded, input|
-        if String.new.respond_to?(:encoding)
-          assert_equal Ascii85.decode(input), decoded.dup.force_encoding('ASCII-8BIT')
-        else
-          assert_equal Ascii85.decode(input), decoded
-        end
+        assert_equal Ascii85.decode(input), decoded.dup.force_encoding('ASCII-8BIT')
       end
     end
 
