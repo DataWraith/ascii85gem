@@ -15,7 +15,7 @@ and https://en.wikipedia.org/wiki/Ascii85 for more information about the format.
 
 ## Installation
 
-`sudo gem install Ascii85`
+`$ gem install Ascii85`
 
 
 ## Usage
@@ -37,9 +37,9 @@ In addition, `Ascii85.encode` can take a second parameter that specifies the
 length of the returned lines. The default is 80; use `false` for unlimited.
 
 `Ascii85.decode` expects the input to be enclosed in `<~` and `~>` — it
-ignores everything outside of these. The output of Ascii85.decode will have the
-`ASCII-8BIT` encoding, so you may have to use `String#force_encoding` to correct
-the encoding.
+ignores everything outside of these. The output of `Ascii85.decode` will have
+the `ASCII-8BIT` encoding, so you may have to use `String#force_encoding` to
+correct the encoding.
 
 
 ## Command-line utility
