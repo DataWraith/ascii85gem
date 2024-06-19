@@ -84,22 +84,40 @@ module Ascii85
     # Otherwise we wrap the lines
     line_length = [2, wrap_lines.to_i].max
 
-    wrapped = []
-    to_wrap = '<~' + tuples.join
+    wrapped = "<~".dup
+    cur_len = 2
+    buffer  = tuples.shift
 
-    0.step(to_wrap.length, line_length) do |index|
-      wrapped << to_wrap.slice(index, line_length)
+    until tuples.empty? && buffer.nil?
+      # Line is full -> Linebreak
+      if cur_len == line_length
+        wrapped << "\n"
+        cur_len = 0
+        next
+      end
+
+      # Buffer fits into line
+      if cur_len + buffer.bytesize <= line_length
+        wrapped << buffer
+        cur_len += buffer.bytesize
+        buffer = tuples.shift
+        next
+      end
+
+      # Otherwise break buffer into two pieces and append the first one
+      remaining = line_length - cur_len
+      wrapped << buffer[0...remaining]
+      buffer = buffer[remaining..]
+      cur_len += remaining
     end
 
-    # Add end-marker – on a new line if necessary
-    if (wrapped.last.length + 2) > line_length
-      wrapped << '~>'
-    else
-      wrapped[-1] << '~>'
-    end
+    # Add the closing delimiter (may need to be pushed to the next line)
+    wrapped << "\n" if cur_len + 2 > line_length
+    wrapped << "~>"
 
-    return wrapped.join("\n")
+    wrapped
   end
+
 
   #
   # Searches through +str+ and extracts the _first_ Ascii85-String delimited
