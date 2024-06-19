@@ -19,7 +19,7 @@ module Ascii85
   #
   # If +wrap_lines+ evaluates to +false+, the output will be returned as
   # a single long line. Otherwise #encode formats the output into lines
-  # of length +wrap_lines+ (minimum is 2).
+  # of length +wrap_lines+ (minimum is 2, default is 80).
   #
   #     Ascii85.encode("Ruby")
   #     => <~;KZGo~>
@@ -152,7 +152,7 @@ module Ascii85
   # Searches through +str+ and decodes the _first_ Ascii85-String found.
   #
   # #decode expects an Ascii85-encoded String enclosed in +<~+ and +~>+ — it
-  # will ignore all characters outside these markers. The returned strings are
+  # will ignore all characters outside these markers. The returned String is
   # always encoded as ASCII-8BIT.
   #
   #     Ascii85.decode("<~;KZGo~>")
@@ -172,11 +172,12 @@ module Ascii85
     self.decode_raw(input)
   end
 
+
   #
-  # Decodes the given Ascii85-String.
+  # Decodes the given raw Ascii85-String.
   #
   # #decode_raw expects an Ascii85-encoded String NOT enclosed in +<~+ and +~>+.
-  # The returned strings are always encoded as ASCII-8BIT.
+  # The returned String is always encoded as ASCII-8BIT.
   #
   #     Ascii85.decode_raw(";KZGo")
   #     => "Ruby"
@@ -184,7 +185,7 @@ module Ascii85
   #     Ascii85.decode_raw("<~;KZGo~>")
   #     => Raises Ascii85::DecodingError
   #
-  # #decode will raise Ascii85::DecodingError when malformed input is
+  # #decode_raw will raise Ascii85::DecodingError when malformed input is
   # encountered.
   #
   def self.decode_raw(str)
