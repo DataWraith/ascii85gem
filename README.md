@@ -30,6 +30,9 @@ Ascii85.encode("Ruby")
 Ascii85.decode("<~;KZGo~>")
 => "Ruby"
 
+Ascii85.extract("Foo<~;KZGo~>Bar")
+=> ";KZGo"
+
 Ascii85.decode_raw(";KZGo")
 => "Ruby"
 ```
