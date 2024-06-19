@@ -28,6 +28,9 @@ Ascii85.encode("Ruby")
 
 Ascii85.decode("<~;KZGo~>")
 => "Ruby"
+
+Ascii85.decode_raw(";KZGo")
+=> "Ruby"
 ```
 
 In addition, `Ascii85.encode` can take a second parameter that specifies the
