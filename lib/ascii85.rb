@@ -155,8 +155,7 @@ module Ascii85
   #     Ascii85.decode("No delimiters")
   #     => ""
   #
-  # #decode will raise Ascii85::DecodingError when malformed input is
-  # encountered.
+  # Raises Ascii85::DecodingError when malformed input is encountered.
   #
   def self.decode(str)
     decode_raw(extract(str))
@@ -171,11 +170,7 @@ module Ascii85
   #     Ascii85.decode_raw(";KZGo")
   #     => "Ruby"
   #
-  #     Ascii85.decode_raw("<~;KZGo~>")
-  #     => Raises Ascii85::DecodingError
-  #
-  # #decode_raw will raise Ascii85::DecodingError when malformed input is
-  # encountered.
+  # Raises Ascii85::DecodingError when malformed input is encountered.
   #
   def self.decode_raw(str)
     input = str.to_s
@@ -234,7 +229,7 @@ module Ascii85
 
     raise(Ascii85::DecodingError, 'Last 5-tuple consists of single character') if count == 1
 
-    # Finish last, partially decoded 32-bit-word
+    # Finish last, partially decoded 32-bit word
     count -= 1
     word  += lut[count]
 
@@ -246,8 +241,8 @@ module Ascii85
   end
 
   #
-  # This error is raised when Ascii85.decode encounters one of the following
-  # problems in the input:
+  # This error is raised when Ascii85 encounters one of the following problems
+  # in the input:
   #
   # * An invalid character. Valid characters are '!'..'u' and 'z'.
   # * A 'z' character inside a 5-tuple. 'z's are only valid on their own.
