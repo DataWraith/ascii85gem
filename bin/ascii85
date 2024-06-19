@@ -5,38 +5,35 @@
 # from the GNU Coreutils.
 #
 
-
-require "optparse"
+require 'optparse'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'ascii85')
 require File.join(File.dirname(__FILE__), '..', 'lib', 'Ascii85', 'version')
 
 @options = {
-  :wrap   => 80,
-  :decode => false
+  wrap: 80,
+  decode: false
 }
 
 ARGV.options do |opts|
   opts.banner = "Usage: #{File.basename($PROGRAM_NAME)} [OPTIONS] [FILE]\n" +
-                "Encodes or decodes FILE or STDIN using Ascii85 and writes to STDOUT."
+                'Encodes or decodes FILE or STDIN using Ascii85 and writes to STDOUT.'
 
-
-  opts.on( "-w", "--wrap COLUMN", Integer,
-          "Wrap lines at COLUMN. Default is 80, use 0 for no wrapping") do |opt|
-
+  opts.on('-w', '--wrap COLUMN', Integer,
+          'Wrap lines at COLUMN. Default is 80, use 0 for no wrapping') do |opt|
     @options[:wrap] = opt.abs
     @options[:wrap] = false if opt.zero?
   end
 
-  opts.on( "-d", "--decode", "Decode the input") do
+  opts.on('-d', '--decode', 'Decode the input') do
     @options[:decode] = true
   end
 
-  opts.on( "-h", "--help", "Display this help and exit") do
+  opts.on('-h', '--help', 'Display this help and exit') do
     puts opts
     exit
   end
 
-  opts.on( "--version", "Output version information") do |opt|
+  opts.on('--version', 'Output version information') do |_opt|
     puts "Ascii85 v#{Ascii85::VERSION},\nwritten by Johannes Holzfuß"
     exit
   end
@@ -57,20 +54,14 @@ end
 # but the program will continue running. However, @options[:file] will not be
 # set, so we can detect this condition and simply exit with an error status
 # code while OptParse prints out the error message.
-if @options[:file].nil?
-  exit 1
-end
+exit 1 if @options[:file].nil?
 
 if @options[:file] == '-'
   @input = $stdin.binmode.read
 else
-  unless File.exist?(@options[:file])
-    abort "File not found: \"#{@options[:file]}\""
-  end
+  abort "File not found: \"#{@options[:file]}\"" unless File.exist?(@options[:file])
 
-  unless File.readable_real?(@options[:file])
-    abort "File is not readable: \"#{@options[:file]}\""
-  end
+  abort "File is not readable: \"#{@options[:file]}\"" unless File.readable_real?(@options[:file])
 
   @input = File.binread(@options[:file])
 end
@@ -78,8 +69,8 @@ end
 if @options[:decode]
   begin
     print Ascii85.decode(@input)
-  rescue Ascii85::DecodingError => error
-    abort "Decoding Error: #{error.message.to_s}"
+  rescue Ascii85::DecodingError => e
+    abort "Decoding Error: #{e.message}"
   end
 else
   print Ascii85.encode(@input, @options[:wrap])

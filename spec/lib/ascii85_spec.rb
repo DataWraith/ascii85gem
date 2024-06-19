@@ -2,45 +2,45 @@ require 'rubygems'
 require 'minitest/autorun'
 
 # Require implementation
-require File.expand_path('../../../lib/ascii85', __FILE__)
+require File.expand_path('../../lib/ascii85', __dir__)
 
 describe Ascii85 do
   TEST_CASES = {
-    ""          => "",
-    " "         => "<~+9~>",
+    '' => '',
+    ' ' => '<~+9~>',
 
-    "\0" * 1    => "<~!!~>",
-    "\0" * 2    => "<~!!!~>",
-    "\0" * 3    => "<~!!!!~>",
-    "\0" * 4    => "<~z~>",
-    "\0" * 5    => "<~z!!~>",
-    "A\0\0\0\0" => "<~5l^lb!!~>", # No z-abbreviation!
+    "\0" * 1 => '<~!!~>',
+    "\0" * 2 => '<~!!!~>',
+    "\0" * 3 => '<~!!!!~>',
+    "\0" * 4 => '<~z~>',
+    "\0" * 5 => '<~z!!~>',
+    "A\0\0\0\0" => '<~5l^lb!!~>', # No z-abbreviation!
 
-    "A"         => "<~5l~>",
-    "AB"        => "<~5sb~>",
-    "ABC"       => "<~5sdp~>",
-    "ABCD"      => "<~5sdq,~>",
-    "ABCDE"     => "<~5sdq,70~>",
-    "ABCDEF"    => "<~5sdq,77I~>",
-    "ABCDEFG"   => "<~5sdq,77Kc~>",
-    "ABCDEFGH"  => "<~5sdq,77Kd<~>",
-    "ABCDEFGHI" => "<~5sdq,77Kd<8H~>",
-    "Ascii85"   => "<~6$$OMBfIs~>",
+    'A' => '<~5l~>',
+    'AB' => '<~5sb~>',
+    'ABC' => '<~5sdp~>',
+    'ABCD' => '<~5sdq,~>',
+    'ABCDE' => '<~5sdq,70~>',
+    'ABCDEF' => '<~5sdq,77I~>',
+    'ABCDEFG' => '<~5sdq,77Kc~>',
+    'ABCDEFGH' => '<~5sdq,77Kd<~>',
+    'ABCDEFGHI' => '<~5sdq,77Kd<8H~>',
+    'Ascii85' => '<~6$$OMBfIs~>',
 
     'Antidisestablishmentarianism' => '<~6#LdYA8-*rF*(i"Ch[s(D.RU,@<-\'jDJ=0/~>',
 
     # Dōmo arigatō, Mr. Roboto (according to Wikipedia)
     'どうもありがとうミスターロボット' =>
-        "<~j+42iJVN3:K&_E6j+<0KJW/W?W8iG`j+EuaK\"9on^Z0sZj+FJoK:LtSKB%T?~>",
+        '<~j+42iJVN3:K&_E6j+<0KJW/W?W8iG`j+EuaK"9on^Z0sZj+FJoK:LtSKB%T?~>',
 
-    [Math::PI].pack('G') => "<~5RAV2<(&;T~>",
-    [Math::E].pack('G')  => "<~5R\"n0M\\K6,~>"
+    [Math::PI].pack('G') => '<~5RAV2<(&;T~>',
+    [Math::E].pack('G') => '<~5R"n0M\\K6,~>'
   }
 
-  it "#decode should be the inverse of #encode" do
+  it '#decode should be the inverse of #encode' do
     # Generate a random string
     test_str = String.new
-    (1 + rand(255)).times do
+    rand(1..255).times do
       test_str << rand(256).chr
     end
 
@@ -50,21 +50,21 @@ describe Ascii85 do
     assert_equal decoded, test_str
   end
 
-  describe "#encode" do
-    it "should encode all specified test-cases correctly" do
+  describe '#encode' do
+    it 'should encode all specified test-cases correctly' do
       TEST_CASES.each_pair do |input, encoded|
         assert_equal Ascii85.encode(input), encoded
       end
     end
 
-    it "should encode Strings in different encodings correctly" do
+    it 'should encode Strings in different encodings correctly' do
       input_EUC_JP = 'どうもありがとうミスターロボット'.encode('EUC-JP')
       input_binary = input_EUC_JP.force_encoding('ASCII-8BIT')
 
       assert_equal Ascii85.encode(input_EUC_JP), Ascii85.encode(input_binary)
     end
 
-    it "should produce output lines no longer than specified" do
+    it 'should produce output lines no longer than specified' do
       test_str = '0123456789' * 30
 
       #
@@ -75,7 +75,7 @@ describe Ascii85 do
       #
       # x characters per line, except for the last one
       #
-      x = 2 + rand(255) # < test_str.length
+      x = rand(2..256) # < test_str.length
       encoded = Ascii85.encode(test_str, x)
 
       # Determine the length of all lines
@@ -98,13 +98,13 @@ describe Ascii85 do
       assert_empty count_arr
     end
 
-    it "should not split the end-marker to achieve correct line length" do
+    it 'should not split the end-marker to achieve correct line length' do
       assert_equal Ascii85.encode("\0" * 4, 4), "<~z\n~>"
     end
   end
 
-  describe "#decode" do
-    it "should decode all specified test-cases correctly" do
+  describe '#decode' do
+    it 'should decode all specified test-cases correctly' do
       TEST_CASES.each_pair do |decoded, input|
         if String.new.respond_to?(:encoding)
           assert_equal Ascii85.decode(input), decoded.dup.force_encoding('ASCII-8BIT')
@@ -114,8 +114,8 @@ describe Ascii85 do
       end
     end
 
-    it "should accept valid input in encodings other than the default" do
-      input = "Ragnarök  τέχνη  русский язык  I ♥ Ruby"
+    it 'should accept valid input in encodings other than the default' do
+      input = 'Ragnarök  τέχνη  русский язык  I ♥ Ruby'
       input_ascii85 = Ascii85.encode(input)
 
       # Try to encode input_ascii85 in all possible encodings and see if we
@@ -127,7 +127,7 @@ describe Ascii85 do
         # CP949 is a Microsoft Codepage for Korean, which apparently does not
         # include a backslash, even though #ascii_compatible? returns true. This
         # leads to an Ascii85::DecodingError, so we simply skip the encoding.
-        next if encoding.name == "CP949"
+        next if encoding.name == 'CP949'
 
         begin
           to_test = input_ascii85.encode(encoding)
@@ -138,40 +138,40 @@ describe Ascii85 do
       end
     end
 
-    it "should only process data within delimiters" do
-      assert_empty Ascii85.decode("<~~>")
+    it 'should only process data within delimiters' do
+      assert_empty Ascii85.decode('<~~>')
       assert_empty Ascii85.decode("Doesn't contain delimiters")
-      assert_empty Ascii85.decode("Mismatched ~>   delimiters 1")
-      assert_empty Ascii85.decode("Mismatched <~   delimiters 2")
-      assert_empty Ascii85.decode("Mismatched ~><~ delimiters 3")
+      assert_empty Ascii85.decode('Mismatched ~>   delimiters 1')
+      assert_empty Ascii85.decode('Mismatched <~   delimiters 2')
+      assert_empty Ascii85.decode('Mismatched ~><~ delimiters 3')
 
-      assert_equal Ascii85.decode("<~;KZGo~><~z~>"),    "Ruby"
-      assert_equal Ascii85.decode("FooBar<~z~>BazQux"), "\0\0\0\0"
+      assert_equal Ascii85.decode('<~;KZGo~><~z~>'),    'Ruby'
+      assert_equal Ascii85.decode('FooBar<~z~>BazQux'), "\0\0\0\0"
     end
 
-    it "should ignore whitespace" do
+    it 'should ignore whitespace' do
       decoded = Ascii85.decode("<~6   #LdYA\r\08\n  \n\n- *rF*(i\"Ch[s \t(D.RU,@ <-\'jDJ=0\f/~>")
       assert_equal decoded, 'Antidisestablishmentarianism'
     end
 
-    it "should return ASCII-8BIT encoded strings" do
-      assert_equal Ascii85.decode("<~;KZGo~>").encoding.name, "ASCII-8BIT"
+    it 'should return ASCII-8BIT encoded strings' do
+      assert_equal Ascii85.decode('<~;KZGo~>').encoding.name, 'ASCII-8BIT'
     end
 
-    describe "Error conditions" do
-      it "should raise DecodingError if it encounters a word >= 2**32" do
+    describe 'Error conditions' do
+      it 'should raise DecodingError if it encounters a word >= 2**32' do
         assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~s8W-#~>') }
       end
 
-      it "should raise DecodingError if it encounters an invalid character" do
+      it 'should raise DecodingError if it encounters an invalid character' do
         assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~!!y!!~>') }
       end
 
-      it "should raise DecodingError if the last tuple consists of a single character" do
+      it 'should raise DecodingError if the last tuple consists of a single character' do
         assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~!~>') }
       end
 
-      it "should raise DecodingError if a z is found inside a 5-tuple" do
+      it 'should raise DecodingError if a z is found inside a 5-tuple' do
         assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~!!z!!~>') }
       end
     end
