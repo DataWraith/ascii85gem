@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rubygems'
 require 'minitest/autorun'
 
@@ -35,7 +37,7 @@ describe Ascii85 do
 
     [Math::PI].pack('G') => '<~5RAV2<(&;T~>',
     [Math::E].pack('G') => '<~5R"n0M\\K6,~>'
-  }
+  }.freeze
 
   it '#decode should be the inverse of #encode' do
     # Generate a random string

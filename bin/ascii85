@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 #
 # A simple command-line tool to de- and encode Ascii85, modeled after `base64`
@@ -15,7 +16,7 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'Ascii85', 'version')
 }
 
 ARGV.options do |opts|
-  opts.banner = "Usage: #{File.basename($PROGRAM_NAME)} [OPTIONS] [FILE]\n" +
+  opts.banner = "Usage: #{File.basename($PROGRAM_NAME)} [OPTIONS] [FILE]\n" \
                 'Encodes or decodes FILE or STDIN using Ascii85 and writes to STDOUT.'
 
   opts.on('-w', '--wrap COLUMN', Integer,

@@ -52,7 +52,7 @@ module Ascii85
 
     # Encode
     tuples.map! do |tuple|
-      if tuple == 0
+      if tuple.zero?
         'z'
       else
         tmp = '!!!!!'.dup
@@ -67,13 +67,13 @@ module Ascii85
     end
 
     # We can't use the z-abbreviation if we're going to cut off padding
-    tuples[-1] = '!!!!!' if (padding_length > 0) && (tuples.last == 'z')
+    tuples[-1] = '!!!!!' if padding_length.positive? && (tuples.last == 'z')
 
     # Cut off the padding
     tuples[-1] = tuples[-1][0..(4 - padding_length)]
 
     # If we don't need to wrap the lines, add delimiters and return
-    return '<~' + tuples.join + '~>' unless wrap_lines
+    return "<~#{tuples.join}~>" unless wrap_lines
 
     # Otherwise we wrap the lines
     line_length = [2, wrap_lines.to_i].max
@@ -199,7 +199,7 @@ module Ascii85
         next
 
       when 'z'
-        raise(Ascii85::DecodingError, "Found 'z' inside Ascii85 5-tuple") unless count == 0
+        raise(Ascii85::DecodingError, "Found 'z' inside Ascii85 5-tuple") unless count.zero?
 
         # Expand z to 0-word
         result << 0
