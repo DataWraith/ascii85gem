@@ -40,10 +40,10 @@ TEST_CASES = {
 
 describe Ascii85 do
   it '#decode should be the inverse of #encode' do
-    # Generate a random string
+    # Generate a test string that contains all possible bytes
     test_str = String.new
-    rand(1..255).times do
-      test_str << rand(256).chr
+    (0..255).each do |c|
+      test_str << c.chr
     end
 
     encoded = Ascii85.encode(test_str)
