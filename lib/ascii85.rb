@@ -5,9 +5,8 @@
 # Ascii85 is an implementation of Adobe's binary-to-text encoding of the
 # same name in pure Ruby.
 #
-# See http://www.adobe.com/products/postscript/pdfs/PLRM.pdf page 131
-# and http://en.wikipedia.org/wiki/Ascii85 for more information about
-# the format.
+# See http://en.wikipedia.org/wiki/Ascii85 for more information about the
+# format.
 #
 # Author::  Johannes Holzfuß (johannes@holzfuss.name)
 # License:: Distributed under the MIT License (see LICENSE file)
