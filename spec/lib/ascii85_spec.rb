@@ -77,27 +77,28 @@ describe Ascii85 do
       #
       # x characters per line, except for the last one
       #
-      x = rand(2..256) # < test_str.length
-      encoded = Ascii85.encode(test_str, x)
+      (2..12).each do |x|
+        encoded = Ascii85.encode(test_str, x)
 
-      # Determine the length of all lines
-      count_arr = []
-      encoded.each_line do |line|
-        count_arr << line.chomp.length
+        # Determine the length of all lines
+        count_arr = []
+        encoded.each_line do |line|
+          count_arr << line.chomp.length
+        end
+
+        # The last line is allowed to be shorter than x, so remove it
+        count_arr.pop if count_arr.last <= x
+
+        # If the end-marker is on a line of its own, the next-to-last line is
+        # allowed to be shorter than specified by exactly one character
+        count_arr.pop if (encoded[-3].chr =~ /[\r\n]/) && (count_arr.last == x - 1)
+
+        # Remove all line-lengths that are of length x from count_arr
+        count_arr.delete_if { |len| len == x }
+
+        # Now count_arr should be empty
+        assert_empty count_arr
       end
-
-      # The last line is allowed to be shorter than x, so remove it
-      count_arr.pop if count_arr.last <= x
-
-      # If the end-marker is on a line of its own, the next-to-last line is
-      # allowed to be shorter than specified by exactly one character
-      count_arr.pop if (encoded[-3].chr =~ /[\r\n]/) && (count_arr.last == x - 1)
-
-      # Remove all line-lengths that are of length x from count_arr
-      count_arr.delete_if { |len| len == x }
-
-      # Now count_arr should be empty
-      assert_empty count_arr
     end
 
     it 'should not split the end-marker to achieve correct line length' do
