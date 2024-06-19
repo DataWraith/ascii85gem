@@ -70,7 +70,7 @@ module Ascii85
     end
 
     # We can't use the z-abbreviation if we're going to cut off padding
-    if (padding_length > 0) and (tuples.last == 'z')
+    if (padding_length > 0) && (tuples.last == 'z')
       tuples[-1] = '!!!!!'
     end
 
