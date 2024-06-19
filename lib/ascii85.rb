@@ -129,8 +129,48 @@ module Ascii85
     input[(start_pos + 2)...end_pos]
   end
 
+
+  #
+  # Searches through +str+ and decodes the _first_ Ascii85-String found.
+  #
+  # #decode expects an Ascii85-encoded String enclosed in +<~+ and +~>+ — it
+  # will ignore all characters outside these markers. The returned strings are
+  # always encoded as ASCII-8BIT.
+  #
+  #     Ascii85.decode("<~;KZGo~>")
+  #     => "Ruby"
+  #
+  #     Ascii85.decode("Foo<~;KZGo~>Bar<~87cURDZ~>Baz")
+  #     => "Ruby"
+  #
+  #     Ascii85.decode("No markers")
+  #     => ""
+  #
+  # #decode will raise Ascii85::DecodingError when malformed input is
+  # encountered.
+  #
   def self.decode(str)
     input = self.extract(str)
+    self.decode_raw(input)
+  end
+
+  #
+  # Decodes the given Ascii85-String.
+  #
+  # #decode_raw expects an Ascii85-encoded String NOT enclosed in +<~+ and +~>+.
+  # The returned strings are always encoded as ASCII-8BIT.
+  #
+  #     Ascii85.decode_raw(";KZGo")
+  #     => "Ruby"
+  #
+  #     Ascii85.decode_raw("<~;KZGo~>")
+  #     => Raises Ascii85::DecodingError
+  #
+  # #decode will raise Ascii85::DecodingError when malformed input is
+  # encountered.
+  #
+  def self.decode_raw(str)
+    input = str.to_s
 
     return input if input.empty?
 
