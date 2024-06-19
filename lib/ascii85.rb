@@ -77,7 +77,7 @@ module Ascii85
     tuples[-1] = tuples[-1][0..(4 - padding_length)]
 
     # If we don't need to wrap the lines, add delimiters and return
-    if (!wrap_lines)
+    unless wrap_lines
       return '<~' + tuples.join + '~>'
     end
 

@@ -89,7 +89,7 @@ describe Ascii85 do
 
       # If the end-marker is on a line of its own, the next-to-last line is
       # allowed to be shorter than specified by exactly one character
-      count_arr.pop if (encoded[-3].chr =~ /[\r\n]/) and (count_arr.last == x-1)
+      count_arr.pop if (encoded[-3].chr =~ /[\r\n]/) && (count_arr.last == x - 1)
 
       # Remove all line-lengths that are of length x from count_arr
       count_arr.delete_if { |len| len == x }
