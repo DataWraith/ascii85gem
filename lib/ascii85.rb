@@ -35,7 +35,7 @@ module Ascii85
     to_encode = str.to_s
     input_size = to_encode.bytesize
 
-    return '' if input_size.zero?
+    return ''.dup if input_size.zero?
 
     # Compute number of \0s to pad the message with (0..3)
     padding_length = (-input_size) % 4
@@ -132,8 +132,8 @@ module Ascii85
 
     # Get the positions of the opening/closing delimiters. If there is
     # no pair of opening/closing delimiters, return the empty string.
-    (start_pos = input.index(opening_delim))                or return ''
-    (end_pos   = input.index(closing_delim, start_pos + 2)) or return ''
+    (start_pos = input.index(opening_delim))                or return ''.dup
+    (end_pos   = input.index(closing_delim, start_pos + 2)) or return ''.dup
 
     # Get the string inside the delimiter-pair
     input[(start_pos + 2)...end_pos]
@@ -175,7 +175,7 @@ module Ascii85
   def self.decode_raw(str)
     input = str.to_s
 
-    return input if input.empty?
+    return ''.dup if input.empty?
 
     # Populate the lookup table (caches the exponentiation)
     lut = (0..4).map { |count| 85**(4 - count) }
