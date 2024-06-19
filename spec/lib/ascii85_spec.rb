@@ -105,6 +105,19 @@ describe Ascii85 do
     end
   end
 
+  describe '#extract' do
+    it 'should extract data within delimiters only' do
+      assert_empty Ascii85.extract('<~~>')
+      assert_empty Ascii85.extract("Doesn't contain delimiters")
+      assert_empty Ascii85.extract('Mismatched ~>   delimiters 1')
+      assert_empty Ascii85.extract('Mismatched <~   delimiters 2')
+      assert_empty Ascii85.extract('Mismatched ~><~ delimiters 3')
+
+      assert_equal Ascii85.extract('<~;KZGo~><~z~>'),    ';KZGo'
+      assert_equal Ascii85.extract('FooBar<~z~>BazQux'), 'z'
+    end
+  end
+
   describe '#decode' do
     it 'should decode all specified test-cases correctly' do
       TEST_CASES.each_pair do |decoded, input|
