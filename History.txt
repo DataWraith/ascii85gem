@@ -7,8 +7,8 @@ BREAKING CHANGES:
 Other changes:
 
   * Performance optimizations
-  * Added `Ascii85#decode_raw` that does not require the input to be wrapped
-    in `<~` and `~>` delimiters
+  * Added `Ascii85#decode_raw`. The new method does not expect the input to be 
+    wrapped in `<~` and `~>` delimiters
 
 === 1.1.1 / 2024-05-09
 
