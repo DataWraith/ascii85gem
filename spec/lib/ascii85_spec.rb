@@ -6,39 +6,39 @@ require 'minitest/autorun'
 # Require implementation
 require File.expand_path('../../lib/ascii85', __dir__)
 
+TEST_CASES = {
+  '' => '',
+  ' ' => '<~+9~>',
+
+  "\0" * 1 => '<~!!~>',
+  "\0" * 2 => '<~!!!~>',
+  "\0" * 3 => '<~!!!!~>',
+  "\0" * 4 => '<~z~>',
+  "\0" * 5 => '<~z!!~>',
+  "A\0\0\0\0" => '<~5l^lb!!~>', # No z-abbreviation!
+
+  'A' => '<~5l~>',
+  'AB' => '<~5sb~>',
+  'ABC' => '<~5sdp~>',
+  'ABCD' => '<~5sdq,~>',
+  'ABCDE' => '<~5sdq,70~>',
+  'ABCDEF' => '<~5sdq,77I~>',
+  'ABCDEFG' => '<~5sdq,77Kc~>',
+  'ABCDEFGH' => '<~5sdq,77Kd<~>',
+  'ABCDEFGHI' => '<~5sdq,77Kd<8H~>',
+  'Ascii85' => '<~6$$OMBfIs~>',
+
+  'Antidisestablishmentarianism' => '<~6#LdYA8-*rF*(i"Ch[s(D.RU,@<-\'jDJ=0/~>',
+
+  # Dōmo arigatō, Mr. Roboto (according to Wikipedia)
+  'どうもありがとうミスターロボット' =>
+      '<~j+42iJVN3:K&_E6j+<0KJW/W?W8iG`j+EuaK"9on^Z0sZj+FJoK:LtSKB%T?~>',
+
+  [Math::PI].pack('G') => '<~5RAV2<(&;T~>',
+  [Math::E].pack('G') => '<~5R"n0M\\K6,~>'
+}.freeze
+
 describe Ascii85 do
-  TEST_CASES = {
-    '' => '',
-    ' ' => '<~+9~>',
-
-    "\0" * 1 => '<~!!~>',
-    "\0" * 2 => '<~!!!~>',
-    "\0" * 3 => '<~!!!!~>',
-    "\0" * 4 => '<~z~>',
-    "\0" * 5 => '<~z!!~>',
-    "A\0\0\0\0" => '<~5l^lb!!~>', # No z-abbreviation!
-
-    'A' => '<~5l~>',
-    'AB' => '<~5sb~>',
-    'ABC' => '<~5sdp~>',
-    'ABCD' => '<~5sdq,~>',
-    'ABCDE' => '<~5sdq,70~>',
-    'ABCDEF' => '<~5sdq,77I~>',
-    'ABCDEFG' => '<~5sdq,77Kc~>',
-    'ABCDEFGH' => '<~5sdq,77Kd<~>',
-    'ABCDEFGHI' => '<~5sdq,77Kd<8H~>',
-    'Ascii85' => '<~6$$OMBfIs~>',
-
-    'Antidisestablishmentarianism' => '<~6#LdYA8-*rF*(i"Ch[s(D.RU,@<-\'jDJ=0/~>',
-
-    # Dōmo arigatō, Mr. Roboto (according to Wikipedia)
-    'どうもありがとうミスターロボット' =>
-        '<~j+42iJVN3:K&_E6j+<0KJW/W?W8iG`j+EuaK"9on^Z0sZj+FJoK:LtSKB%T?~>',
-
-    [Math::PI].pack('G') => '<~5RAV2<(&;T~>',
-    [Math::E].pack('G') => '<~5R"n0M\\K6,~>'
-  }.freeze
-
   it '#decode should be the inverse of #encode' do
     # Generate a random string
     test_str = String.new
@@ -60,10 +60,10 @@ describe Ascii85 do
     end
 
     it 'should encode Strings in different encodings correctly' do
-      input_EUC_JP = 'どうもありがとうミスターロボット'.encode('EUC-JP')
-      input_binary = input_EUC_JP.force_encoding('ASCII-8BIT')
+      input_euc_jp = 'どうもありがとうミスターロボット'.encode('EUC-JP')
+      input_binary = input_euc_jp.force_encoding('ASCII-8BIT')
 
-      assert_equal Ascii85.encode(input_EUC_JP), Ascii85.encode(input_binary)
+      assert_equal Ascii85.encode(input_euc_jp), Ascii85.encode(input_binary)
     end
 
     it 'should produce output lines no longer than specified' do

@@ -10,7 +10,6 @@
 # Author::  Johannes Holzfuß (johannes@holzfuss.name)
 # License:: Distributed under the MIT License (see LICENSE file)
 #
-
 module Ascii85
   #
   # Encodes the bytes of the given String as Ascii85.
