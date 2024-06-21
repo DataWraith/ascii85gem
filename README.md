@@ -62,6 +62,12 @@ Encodes or decodes FILE or STDIN using Ascii85 and writes to STDOUT.
 ```
 
 
+## Limitations
+
+The library and `ascii85` executable both read the entire input into memory
+before converting it, so they are only suitable for small-ish inputs.
+
+
 ## License
 
 Ascii85 is distributed under the MIT License. See the accompanying LICENSE file
