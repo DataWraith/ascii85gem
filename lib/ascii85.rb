@@ -327,11 +327,11 @@ module Ascii85
     end
 
     def unencoded_chunk_size
-      4 * 8192
+      4 * 2048
     end
 
     def encoded_chunk_size
-      5 * 8192
+      5 * 2048
     end
   end
 
