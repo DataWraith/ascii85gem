@@ -6,7 +6,6 @@ BREAKING CHANGES:
 
 Other changes:
 
-  * Performance optimizations
   * Added `Ascii85#decode_raw`. The new method does not expect the input to be 
     wrapped in `<~` and `~>` delimiters
 
