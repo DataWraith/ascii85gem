@@ -61,7 +61,6 @@ if @options[:file] == '-'
   @input = $stdin.binmode.read
 else
   abort "File not found: \"#{@options[:file]}\"" unless File.exist?(@options[:file])
-
   abort "File is not readable: \"#{@options[:file]}\"" unless File.readable_real?(@options[:file])
 
   @input = File.binread(@options[:file])
@@ -69,10 +68,10 @@ end
 
 if @options[:decode]
   begin
-    print Ascii85.decode(@input)
+    puts Ascii85.decode(@input)
   rescue Ascii85::DecodingError => e
     abort "Decoding Error: #{e.message}"
   end
 else
-  print Ascii85.encode(@input, @options[:wrap])
+  puts Ascii85.encode(@input, @options[:wrap])
 end
