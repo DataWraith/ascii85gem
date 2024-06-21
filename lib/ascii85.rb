@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'stringio'
+
 #
 # Ascii85 is an implementation of Adobe's binary-to-text encoding of the
 # same name in pure Ruby.
@@ -32,40 +34,75 @@ module Ascii85
     #     => <~;g!%jEarNoBkDBoB5)0rF*),+AU&0.@;KXgDe!L"F`R~>
     #
     #
-    def encode(str, wrap_lines = 80)
-      to_encode = str.to_s
-      input_size = to_encode.bytesize
-
-      # We dup here to return an unfrozen String (matches non-empty input case)
-      return ''.dup if input_size.zero?
-
-      # Compute number of \0s to pad the message with (0..3)
-      padding_length = (-input_size) % 4
-
-      # Extract big-endian integers
-      tuples = to_encode.unpack('N*')
-
-      # Add padding and trailing bytes if necessary
-      if padding_length != 0
-        trailing = to_encode[-(4 - padding_length)..]
-        padding = "\0" * padding_length
-        tuples << (trailing + padding).unpack1('N')
+    def encode(str, wrap_lines = 80, out: nil)
+      if str.is_a?(IO)
+        reader = str
+      else
+        reader = StringIO.new(str.to_s, 'rb')
       end
 
-      # Encode
-      tuples.map! { |t| encode_word(t) }
+      bufreader = BufferedReader.new(reader, unencoded_chunk_size)
+      bufwriter = BufferedWriter.new(out || StringIO.new(String.new, 'wb'), encoded_chunk_size)
 
-      # We can't use the z-abbreviation if we're going to cut off padding
-      tuples[-1] = '!!!!!' if padding_length.positive? && (tuples.last == 'z')
+      padding = "\0" * 4
+      tuplebuf = '!!!!!'.dup
 
-      # Cut off the padding
-      tuples[-1] = tuples[-1][0..(4 - padding_length)]
+      writer = wrap_lines ? Wrapper.new(bufwriter, wrap_lines) : DummyWrapper.new(bufwriter)
 
-      # If we don't need to wrap the lines, add delimiters and return
-      return "<~#{tuples.join}~>" unless wrap_lines
+      is_empty = true
+      bufreader.each_chunk do |chunk|
+        is_empty = false
+        
+        chunk.unpack('N*').each do |word|
+          if word.zero?
+            writer.write('z')
+          else
+            b0 = ((word % 85) + 33); word /= 85
+            b1 = ((word % 85) + 33); word /= 85
+            b2 = ((word % 85) + 33); word /= 85
+            b3 = ((word % 85) + 33); word /= 85
+            b4 = (word + 33)
 
-      # Otherwise we wrap the lines
-      wrap_tuples(tuples, wrap_lines)
+            tuplebuf.setbyte(0, b4)
+            tuplebuf.setbyte(1, b3)
+            tuplebuf.setbyte(2, b2)
+            tuplebuf.setbyte(3, b1)
+            tuplebuf.setbyte(4, b0)
+
+            writer.write(tuplebuf)
+           end
+        end
+
+        next if (chunk.bytesize & 0b11).zero?
+
+        padding_length = (-chunk.bytesize) & 0b11
+
+        trailing = chunk[-(4 - padding_length)..]
+        word =  (trailing + padding[0...padding_length]).unpack1('N')
+
+        if word.zero?
+          writer.write('!!!!!'[0..(4 - padding_length)])
+        else
+          b0 = ((word % 85) + 33); word /= 85
+          b1 = ((word % 85) + 33); word /= 85
+          b2 = ((word % 85) + 33); word /= 85
+          b3 = ((word % 85) + 33); word /= 85
+          b4 = (word + 33)
+
+          tuplebuf.setbyte(0, b4)
+          tuplebuf.setbyte(1, b3)
+          tuplebuf.setbyte(2, b2)
+          tuplebuf.setbyte(3, b1)
+          tuplebuf.setbyte(4, b0)
+
+          writer.write(tuplebuf[0..(4 - padding_length)])
+        end
+      end
+
+      return ''.dup if is_empty
+      return writer.finish.io.string if out.nil?
+
+      writer.finish
     end
 
     #
@@ -196,66 +233,112 @@ module Ascii85
 
     private
 
-    #
-    # Encodes a 32-bit word into a five-character String. If the word is equal
-    # to zero, we abbreviate it with 'z' instead.
-    #
-    def encode_word(word)
-      if word.zero?
-        'z'
-      else
-        tuple = '!!!!!'.dup
+    class BufferedReader
+      def initialize(io, buffer_size)
+        @io = io
+        @buffer_size = buffer_size
+      end
 
-        5.times do |i|
-          tuple.setbyte(4 - i, (word % 85) + 33)
-          word /= 85
+      def each_chunk
+        return enum_for(:each_chunk) unless block_given?
+
+        until @io.eof?
+          chunk = @io.read(@buffer_size)
+          yield chunk if chunk
         end
-
-        tuple
       end
     end
 
-    # 
-    # Wraps the given tuples into lines of length +wrap_lines+ or 2, whichever
-    # is greater.
-    #
-    def wrap_tuples(tuples, wrap_lines)
-      line_length = [2, wrap_lines.to_i].max
+    class BufferedWriter
+      attr_accessor :io
 
-      wrapped = '<~'.dup
-      cur_len = 2
-      idx     = 0
-      buffer  = tuples.first
-
-      until idx >= tuples.size && buffer.nil?
-        # Line is full -> Linebreak
-        if cur_len == line_length
-          wrapped << "\n"
-          cur_len = 0
-          next
-        end
-
-        # Buffer fits into line
-        if cur_len + buffer.bytesize <= line_length
-          wrapped << buffer
-          cur_len += buffer.bytesize
-          idx += 1
-          buffer = tuples[idx]
-          next
-        end
-
-        # Otherwise break buffer into two pieces and append the first one
-        remaining = line_length - cur_len
-        wrapped << buffer[0...remaining]
-        buffer = buffer[remaining..]
-        cur_len += remaining
+      def initialize(io, buffer_size)
+        @io = io
+        @buffer_size = buffer_size
+        @buffer = String.new(capacity: buffer_size)
       end
 
-      # Add the closing delimiter (may need to be pushed to the next line)
-      wrapped << "\n" if cur_len + 2 > line_length
-      wrapped << '~>'
+      def write(tuple)
+        flush if @buffer.bytesize + tuple.bytesize > @buffer_size
+        @buffer << tuple
+      end
 
-      wrapped
+      def flush
+        @io.write(@buffer)
+        @buffer.clear
+      end
+    end
+
+    class DummyWrapper
+      def initialize(out)
+        @out = out
+        @out.write('<~')
+      end
+
+      def write(buffer)
+        @out.write(buffer)
+      end
+
+      def finish
+        @out.write('~>')
+        @out.flush
+
+        @out
+      end
+    end
+
+    class Wrapper
+      def initialize(out, wrap_lines)
+        @line_length = [2, wrap_lines.to_i].max
+
+        @out = out
+        @out.write('<~')
+
+        @cur_len = 2
+      end
+
+      def write(buffer)
+        loop do
+          s = buffer.bytesize
+
+          if @cur_len + s < @line_length
+            @out.write(buffer)
+            @cur_len += s
+            return
+          end
+
+          if @cur_len + s == @line_length
+            @out.write(buffer)
+            @out.write("\n")
+            @cur_len = 0
+            return
+          end
+
+          remaining = @line_length - @cur_len
+          @out.write(buffer[0...remaining])
+          @out.write("\n")
+          @cur_len = 0
+          buffer = buffer[remaining..]
+          return if buffer.empty?
+        end
+      end
+
+      def finish
+        # Add the closing delimiter (may need to be pushed to the next line)
+        @out.write("\n") if @cur_len + 2 > @line_length
+        @out.write('~>')
+        @out.flush
+
+        @out
+      end
+    end
+
+    def unencoded_chunk_size
+      4 * 8192
+    end
+
+    def encoded_chunk_size
+      5 * 8192
     end
   end
 
