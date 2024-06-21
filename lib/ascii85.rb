@@ -51,7 +51,7 @@ module Ascii85
       end
 
       # Encode
-      tuples.map! { |t| self.encode_tuple(t) }
+      tuples.map! { |t| encode_tuple(t) }
 
       # We can't use the z-abbreviation if we're going to cut off padding
       tuples[-1] = '!!!!!' if padding_length.positive? && (tuples.last == 'z')
@@ -63,7 +63,7 @@ module Ascii85
       return "<~#{tuples.join}~>" unless wrap_lines
 
       # Otherwise we wrap the lines
-      self.wrap_tuples(tuples, wrap_lines)
+      wrap_tuples(tuples, wrap_lines)
     end
 
     #
