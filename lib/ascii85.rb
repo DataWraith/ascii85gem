@@ -57,25 +57,25 @@ module Ascii85
           if word.zero?
             writer.write('z')
           else
-            b0 = ((word % 85) + 33); word /= 85
-            b1 = ((word % 85) + 33); word /= 85
-            b2 = ((word % 85) + 33); word /= 85
-            b3 = ((word % 85) + 33); word /= 85
-            b4 = (word + 33)
+            word, b0 = word.divmod(85)
+            word, b1 = word.divmod(85)
+            word, b2 = word.divmod(85)
+            word, b3 = word.divmod(85)
+            b4 = word 
 
-            tuplebuf.setbyte(0, b4)
-            tuplebuf.setbyte(1, b3)
-            tuplebuf.setbyte(2, b2)
-            tuplebuf.setbyte(3, b1)
-            tuplebuf.setbyte(4, b0)
+            tuplebuf.setbyte(0, b4 + 33)
+            tuplebuf.setbyte(1, b3 + 33)
+            tuplebuf.setbyte(2, b2 + 33)
+            tuplebuf.setbyte(3, b1 + 33)
+            tuplebuf.setbyte(4, b0 + 33)
 
             writer.write(tuplebuf)
-           end
+          end
         end
 
         next if (chunk.bytesize & 0b11).zero?
 
-        padding_length = (-chunk.bytesize) & 0b11
+        padding_length = (-chunk.bytesize) % 4
 
         trailing = chunk[-(4 - padding_length)..]
         word =  (trailing + padding[0...padding_length]).unpack1('N')
@@ -83,17 +83,17 @@ module Ascii85
         if word.zero?
           writer.write('!!!!!'[0..(4 - padding_length)])
         else
-          b0 = ((word % 85) + 33); word /= 85
-          b1 = ((word % 85) + 33); word /= 85
-          b2 = ((word % 85) + 33); word /= 85
-          b3 = ((word % 85) + 33); word /= 85
-          b4 = (word + 33)
+          word, b0 = word.divmod(85)
+          word, b1 = word.divmod(85)
+          word, b2 = word.divmod(85)
+          word, b3 = word.divmod(85)
+          b4 = word 
 
-          tuplebuf.setbyte(0, b4)
-          tuplebuf.setbyte(1, b3)
-          tuplebuf.setbyte(2, b2)
-          tuplebuf.setbyte(3, b1)
-          tuplebuf.setbyte(4, b0)
+          tuplebuf.setbyte(0, b4 + 33)
+          tuplebuf.setbyte(1, b3 + 33)
+          tuplebuf.setbyte(2, b2 + 33)
+          tuplebuf.setbyte(3, b1 + 33)
+          tuplebuf.setbyte(4, b0 + 33)
 
           writer.write(tuplebuf[0..(4 - padding_length)])
         end
@@ -199,7 +199,7 @@ module Ascii85
           count += 1
 
           if count == 5 && word > 0xffffffff
-              raise(Ascii85::DecodingError, "Invalid Ascii85 5-tuple (#{word} >= 2**32)")
+            raise(Ascii85::DecodingError, "Invalid Ascii85 5-tuple (#{word} >= 2**32)")
           elsif count == 5
             result << word
 
