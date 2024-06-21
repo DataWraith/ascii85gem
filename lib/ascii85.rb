@@ -307,13 +307,6 @@ module Ascii85
             return
           end
 
-          if @cur_len + s == @line_length
-            @out.write(buffer)
-            @out.write("\n")
-            @cur_len = 0
-            return
-          end
-
           remaining = @line_length - @cur_len
           @out.write(buffer[0...remaining])
           @out.write("\n")
