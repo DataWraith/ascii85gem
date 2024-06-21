@@ -15,9 +15,9 @@ module Ascii85
     #
     # Encodes the bytes of the given String as Ascii85.
     #
-    # If +wrap_lines+ evaluates to +false+, the output will be returned as
-    # a single long line. Otherwise #encode formats the output into lines
-    # of length +wrap_lines+ (minimum is 2, default is 80).
+    # If +wrap_lines+ evaluates to +false+, the output will be returned as a
+    # single long line. Otherwise +#encode+ formats the output into lines of
+    # length +wrap_lines+ (minimum is 2, default is 80).
     #
     #     Ascii85.encode("Ruby")
     #     => <~;KZGo~>
@@ -36,6 +36,7 @@ module Ascii85
       to_encode = str.to_s
       input_size = to_encode.bytesize
 
+      # We dup here to return an unfrozen String (matches non-empty input case)
       return ''.dup if input_size.zero?
 
       # Compute number of \0s to pad the message with (0..3)
@@ -44,6 +45,7 @@ module Ascii85
       # Extract big-endian integers
       tuples = to_encode.unpack('N*')
 
+      # Add padding if necessary
       if padding_length != 0
         trailing = to_encode[-(4 - padding_length)..]
         padding = "\0" * padding_length
@@ -51,7 +53,7 @@ module Ascii85
       end
 
       # Encode
-      tuples.map! { |t| encode_tuple(t) }
+      tuples.map! { |t| encode_word(t) }
 
       # We can't use the z-abbreviation if we're going to cut off padding
       tuples[-1] = '!!!!!' if padding_length.positive? && (tuples.last == 'z')
@@ -67,8 +69,8 @@ module Ascii85
     end
 
     #
-    # Searches through +str+ and extracts the _first_ Ascii85-String delimited
-    # by +<~+ and +~>+.
+    # Searches through +str+ and extracts the _first_ substring enclosed by +<~+
+    # and +~>+.
     #
     # Returns the empty String if no valid delimiters are found.
     #
@@ -85,8 +87,8 @@ module Ascii85
       opening_delim = '<~'.encode(input.encoding)
       closing_delim = '~>'.encode(input.encoding)
 
-      # Get the positions of the opening/closing delimiters. If there is
-      # no pair of opening/closing delimiters, return the empty string.
+      # Get the positions of the opening/closing delimiters. If there is no pair
+      # of opening/closing delimiters, return an unfrozen empty string.
       (start_pos = input.index(opening_delim))                or return ''.dup
       (end_pos   = input.index(closing_delim, start_pos + 2)) or return ''.dup
 
@@ -95,11 +97,12 @@ module Ascii85
     end
 
     #
-    # Searches through +str+ and decodes the _first_ Ascii85-String found.
+    # Searches through +str+ and decodes the _first_ substring enclosed by +<~+
+    # and +~>+.
     #
-    # #decode expects an Ascii85-encoded String enclosed in +<~+ and +~>+ — it
-    # will ignore all characters outside these delimiters. The returned String is
-    # always encoded as ASCII-8BIT.
+    # +#decode+ expects an Ascii85-encoded String enclosed in +<~+ and +~>+
+    # — it will ignore all characters outside these delimiters. The returned
+    # String is always encoded as +ASCII-8BIT+.
     #
     #     Ascii85.decode("<~;KZGo~>")
     #     => "Ruby"
@@ -119,8 +122,8 @@ module Ascii85
     #
     # Decodes the given raw Ascii85-String.
     #
-    # #decode_raw expects an Ascii85-encoded String NOT enclosed in +<~+ and +~>+.
-    # The returned String is always encoded as ASCII-8BIT.
+    # +#decode_raw+ expects an Ascii85-encoded String NOT enclosed in +<~+ and
+    # +~>+. The returned String is always encoded as +ASCII-8BIT+.
     #
     #     Ascii85.decode_raw(";KZGo")
     #     => "Ruby"
@@ -130,6 +133,7 @@ module Ascii85
     def decode_raw(str)
       input = str.to_s
 
+      # Return an unfrozen String on empty input
       return ''.dup if input.empty?
 
       # Populate the lookup table (caches the exponentiation)
@@ -157,22 +161,16 @@ module Ascii85
           word  += (c - 33) * lut[count]
           count += 1
 
-          if count == 5
-
-            if word > 0xffffffff
-              raise(Ascii85::DecodingError,
-                    "Invalid Ascii85 5-tuple (#{word} >= 2**32)")
-            end
-
+          if count == 5 && word > 0xffffffff
+              raise(Ascii85::DecodingError, "Invalid Ascii85 5-tuple (#{word} >= 2**32)")
+          elsif count == 5
             result << word
 
             word  = 0
             count = 0
           end
-
         else
-          raise(Ascii85::DecodingError,
-                "Illegal character inside Ascii85: #{c.chr.dump}")
+          raise(Ascii85::DecodingError, "Illegal character inside Ascii85: #{c.chr.dump}")
         end
       end
 
@@ -188,16 +186,20 @@ module Ascii85
       count -= 1
       word  += lut[count]
 
-      result << ((word >> 24) & 255).chr if count >= 1
-      result << ((word >> 16) & 255).chr if count >= 2
-      result << ((word >> 8) & 255).chr if count == 3
+      result << ((word >> 24) & 0xff).chr if count >= 1
+      result << ((word >> 16) & 0xff).chr if count >= 2
+      result << ((word >> 8) & 0xff).chr if count == 3
 
       result
     end
 
     private
 
-    def encode_tuple(tuple)
+    #
+    # Encodes a 32-bit word into a five-character String. If the word is equal
+    # to zero, we abbreviate it with 'z'.
+    #
+    def encode_word(tuple)
       if tuple.zero?
         'z'
       else
@@ -212,6 +214,10 @@ module Ascii85
       end
     end
 
+    # 
+    # Wraps the given tuples into lines of length +wrap_lines+ or 2, whichever
+    # is greater.
+    #
     def wrap_tuples(tuples, wrap_lines)
       line_length = [2, wrap_lines.to_i].max
 
