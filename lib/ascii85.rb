@@ -45,7 +45,7 @@ module Ascii85
       # Extract big-endian integers
       tuples = to_encode.unpack('N*')
 
-      # Add padding if necessary
+      # Add padding and trailing bytes if necessary
       if padding_length != 0
         trailing = to_encode[-(4 - padding_length)..]
         padding = "\0" * padding_length
@@ -169,6 +169,7 @@ module Ascii85
             word  = 0
             count = 0
           end
+
         else
           raise(Ascii85::DecodingError, "Illegal character inside Ascii85: #{c.chr.dump}")
         end
@@ -197,20 +198,20 @@ module Ascii85
 
     #
     # Encodes a 32-bit word into a five-character String. If the word is equal
-    # to zero, we abbreviate it with 'z'.
+    # to zero, we abbreviate it with 'z' instead.
     #
-    def encode_word(tuple)
-      if tuple.zero?
+    def encode_word(word)
+      if word.zero?
         'z'
       else
-        tmp = '!!!!!'.dup
+        tuple = '!!!!!'.dup
 
         5.times do |i|
-          tmp.setbyte(4 - i, (tuple % 85) + 33)
-          tuple /= 85
+          tuple.setbyte(4 - i, (word % 85) + 33)
+          word /= 85
         end
 
-        tmp
+        tuple
       end
     end
 
