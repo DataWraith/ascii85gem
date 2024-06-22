@@ -104,6 +104,19 @@ describe Ascii85 do
     it 'should not split the end-marker to achieve correct line length' do
       assert_equal Ascii85.encode("\0" * 4, 4), "<~z\n~>"
     end
+
+    it 'should encode to an IO object when provided' do
+      output = StringIO.new
+      result = Ascii85.encode('Ruby', out: output)
+      assert_equal result, output
+      assert_equal output.string, '<~;KZGo~>'
+    end
+
+    it 'should encode from an IO object' do
+      input = StringIO.new('Ruby')
+      result = Ascii85.encode(input)
+      assert_equal result, '<~;KZGo~>'
+    end
   end
 
   describe '#extract' do
@@ -170,6 +183,13 @@ describe Ascii85 do
       assert_equal Ascii85.decode('<~;KZGo~>').encoding.name, 'ASCII-8BIT'
     end
 
+    it 'should decode to an IO object when provided' do
+      output = StringIO.new
+      result = Ascii85.decode('<~;KZGo~>', out: output)
+      assert_equal result, output
+      assert_equal output.string, 'Ruby'
+    end
+
     describe 'Error conditions' do
       it 'should raise DecodingError if it encounters a word >= 2**32' do
         assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~s8W-#~>') }
@@ -188,4 +208,34 @@ describe Ascii85 do
       end
     end
   end
+
+  describe '#decode_raw' do
+    it 'should decode raw Ascii85 without delimiters' do
+      TEST_CASES.each_pair do |decoded, input|
+        raw_input = input[2...-2] # Remove '<~' and '~>'
+        assert_equal Ascii85.decode_raw(raw_input), decoded.dup.force_encoding('ASCII-8BIT')
+      end
+    end
+
+    it 'should decode from an IO object' do
+      input = StringIO.new(';KZGo')
+      result = Ascii85.decode_raw(input)
+      assert_equal result, 'Ruby'
+    end
+
+    it 'should decode to an IO object when provided' do
+      output = StringIO.new
+      result = Ascii85.decode_raw(';KZGo', out: output)
+      assert_equal result, output
+      assert_equal output.string, 'Ruby'
+    end
+
+    it 'should raise DecodingError for invalid input' do
+      assert_raises(Ascii85::DecodingError) { Ascii85.decode_raw('s8W-#') }
+      assert_raises(Ascii85::DecodingError) { Ascii85.decode_raw('!!y!!') }
+      assert_raises(Ascii85::DecodingError) { Ascii85.decode_raw('!') }
+      assert_raises(Ascii85::DecodingError) { Ascii85.decode_raw('!!z!!') }
+    end
+  end
 end
+
