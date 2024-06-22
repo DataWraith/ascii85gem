@@ -17,34 +17,36 @@ module Ascii85
     #
     # Encodes the bytes of the given String or IO object as Ascii85.
     #
-    # If +wrap_lines+ evaluates to +false+, the output will be returned as a
-    # single long line. Otherwise +#encode+ formats the output into lines of
-    # length +wrap_lines+ (minimum is 2, default is 80).
+    # @param str_or_io [String, IO] The input to encode
+    # @param wrap_lines [Integer, false] The line length for wrapping, or false for no wrapping
+    # @param out [IO, nil] An optional IO-like object to write the output to
     #
-    #     Ascii85.encode("Ruby")
-    #     => <~;KZGo~>
+    # @return [String, IO] The encoded string or the output IO object
     #
-    #     Ascii85.encode("Supercalifragilisticexpialidocious", 15)
-    #     => <~;g!%jEarNoBkD
-    #        BoB5)0rF*),+AU&
-    #        0.@;KXgDe!L"F`R
-    #        ~>
+    # @example Encoding a simple string
+    #   Ascii85.encode("Ruby")
+    #   # => <~;KZGo~>
     #
-    #     Ascii85.encode("Supercalifragilisticexpialidocious", false)
-    #     => <~;g!%jEarNoBkDBoB5)0rF*),+AU&0.@;KXgDe!L"F`R~>
+    # @example Encoding with line wrapping
+    #   Ascii85.encode("Supercalifragilisticexpialidocious", 15)
+    #   # => <~;g!%jEarNoBkD
+    #   #    BoB5)0rF*),+AU&
+    #   #    0.@;KXgDe!L"F`R
+    #   #    ~>
     #
-    #     input = StringIO.new("Ruby")
-    #     Ascii85.encode(input)
-    #     => "<~;KZGo~>"
+    # @example Encoding without line wrapping
+    #   Ascii85.encode("Supercalifragilisticexpialidocious", false)
+    #   # => <~;g!%jEarNoBkDBoB5)0rF*),+AU&0.@;KXgDe!L"F`R~>
     #
-    # You can optionally supply an IO-like object (File handle, StringIO, etc.)
-    # using the +out+ keyword argument. In this case, the output will be written
-    # to that object, and +#encode+ will return this object back to you instead
-    # of returning a String.
+    # @example Encoding from an IO object
+    #   input = StringIO.new("Ruby")
+    #   Ascii85.encode(input)
+    #   # => "<~;KZGo~>"
     #
-    #     output = StringIO.new
-    #     Ascii85.encode("Ruby", out: output)
-    #     => output (with "<~;KZGo~>" written to it)
+    # @example Encoding to an IO object
+    #   output = StringIO.new
+    #   Ascii85.encode("Ruby", out: output)
+    #   # => output (with "<~;KZGo~>" written to it)    
     #
     def encode(str_or_io, wrap_lines = 80, out: nil)
       if str_or_io.is_a?(IO)
@@ -121,21 +123,22 @@ module Ascii85
       writer.finish
     end
 
+    # Searches through a string and extracts the first substring enclosed by '<~' and '~>'.
     #
-    # Searches through +str+ and extracts the _first_ substring enclosed by +<~+
-    # and +~>+.
+    # @param str [String] The string to search through
     #
-    # Returns the empty String if no valid delimiters are found.
+    # @return [String] The extracted substring, or an empty string if no valid delimiters are found
     #
-    #     Ascii85.extract("Foo<~;KZGo~>Bar<~z~>Baz")
-    #     => ";KZGo"
+    # @example Extracting Ascii85 content
+    #   Ascii85.extract("Foo<~;KZGo~>Bar<~z~>Baz")
+    #   # => ";KZGo"
     #
-    #     Ascii85.extract("No delimiters")
-    #     => ""
+    # @example When no delimiters are found
+    #   Ascii85.extract("No delimiters")
+    #   # => ""
     #
-    # NOTE that +#extract+ takes a String only, not an IO-like object. This is
-    #      because the entire String up to the +~>+ delimiter would have to be
-    #      buffered in order to ascertain validity of the input anyway.
+    # @note This method only accepts a String, not an IO-like object, as the entire input
+    #       needs to be buffered to ensure validity.    
     #
     def extract(str)
       input = str.to_s
@@ -154,66 +157,64 @@ module Ascii85
     end
 
     #
-    # Searches through +str+ and decodes the _first_ substring enclosed by +<~+
-    # and +~>+.
+    # Searches through a string and decodes the first substring enclosed by '<~' and '~>'.
     #
-    # +#decode+ expects an Ascii85-encoded String enclosed in +<~+ and +~>+
-    # — it will ignore all characters outside these delimiters. The returned
-    # String is always encoded as +ASCII-8BIT+.
+    # @param str [String] The string containing Ascii85-encoded content
+    # @param out [IO, nil] An optional IO-like object to write the output to
     #
-    #     Ascii85.decode("<~;KZGo~>")
-    #     => "Ruby"
+    # @return [String, IO] The decoded string (in ASCII-8BIT encoding) or the output IO object
     #
-    #     Ascii85.decode("Foo<~;KZGo~>Bar<~87cURDZ~>Baz")
-    #     => "Ruby"
+    # @raise [Ascii85::DecodingError] When malformed input is encountered
     #
-    #     Ascii85.decode("No delimiters")
-    #     => ""
+    # @example Decoding Ascii85 content
+    #   Ascii85.decode("<~;KZGo~>")
+    #   # => "Ruby"
     #
-    # NOTE that +#decode+ takes a String only, not an IO-like object. This
-    # is because the entire String up to the +~>+ delimiter would have to be
-    # buffered anyway in order to tell whether or not the stream is valid. If
-    # you already have a raw Ascii85-encoded String, use +#decode_raw+ instead.
+    # @example Decoding with multiple Ascii85 blocks present
+    #   Ascii85.decode("Foo<~;KZGo~>Bar<~87cURDZ~>Baz")
+    #   # => "Ruby"
     #
-    # You can optionally supply an IO-like object (File handle, StringIO, etc.)
-    # using the +out+ keyword argument. In this case, the output will be written
-    # to that object, and +#decode+ will return this object back to you instead
-    # of returning a String.
+    # @example When no delimiters are found
+    #   Ascii85.decode("No delimiters")
+    #   # => ""
     #
-    #     output = StringIO.new
-    #     Ascii85.decode("<~;KZGo~>", out: output)
-    #     => output (with "Ruby" written to it)
+    # @example Decoding to an IO object
+    #   output = StringIO.new
+    #   Ascii85.decode("<~;KZGo~>", out: output)
+    #   # => output (with "Ruby" written to it)
     #
-    # Raises Ascii85::DecodingError when malformed input is encountered.
+    # @note This method only accepts a String, not an IO-like object, as the entire input
+    #       needs to be buffered to ensure validity.    
     #
     def decode(str, out: nil)
       decode_raw(extract(str), out: out)
     end
 
     #
-    # Decodes the given raw Ascii85-String.
+    # Decodes the given raw Ascii85-encoded string or IO-like object.
     #
-    # +#decode_raw+ expects an Ascii85-encoded String or IO-like object. The
-    # input MUST NOT be enclosed in +<~+ and # +~>+. The returned output is
-    # always encoded as +ASCII-8BIT+.
+    # @param str_or_io [String, IO] The Ascii85-encoded input to decode
+    # @param out [IO, nil] An optional IO-like object to write the output to
     #
-    #     Ascii85.decode_raw(";KZGo")
-    #     => "Ruby"
+    # @return [String, IO] The decoded string (in ASCII-8BIT encoding) or the output IO object
     #
-    #     input = StringIO.new(";KZGo")
-    #     Ascii85.decode_raw(input)
-    #     => "Ruby"
+    # @raise [Ascii85::DecodingError] When malformed input is encountered
     #
-    # You can optionally supply an IO-like object (File handle, StringIO, etc.)
-    # using the +out+ keyword argument. In this case, the output will be written
-    # to that object, and +#decode_raw+ will return this object back to you
-    # instead of returning a String.
+    # @example Decoding a raw Ascii85 string
+    #   Ascii85.decode_raw(";KZGo")
+    #   # => "Ruby"
     #
-    #     output = StringIO.new
-    #     Ascii85.decode_raw(";KZGo", out: output)
-    #     => output (with "Ruby" written to it)
+    # @example Decoding from an IO object
+    #   input = StringIO.new(";KZGo")
+    #   Ascii85.decode_raw(input)
+    #   # => "Ruby"
     #
-    # Raises Ascii85::DecodingError when malformed input is encountered.
+    # @example Decoding to an IO object
+    #   output = StringIO.new
+    #   Ascii85.decode_raw(";KZGo", out: output)
+    #   # => output (with "Ruby" written to it)
+    #
+    # @note The input must not be enclosed in '<~' and '~>' delimiters.    
     #
     def decode_raw(str_or_io, out: nil)
       if str_or_io.is_a?(IO)
@@ -292,6 +293,7 @@ module Ascii85
 
     private
 
+    # @private
     class BufferedReader
       def initialize(io, buffer_size)
         @io = io
@@ -308,6 +310,7 @@ module Ascii85
       end
     end
 
+    # @private
     class BufferedWriter
       attr_accessor :io
 
@@ -328,8 +331,12 @@ module Ascii85
       end
     end
 
-    # This wraps the input in <~ and ~>-delimiters and otherwise passes the
-    # input through unmodified to the underyling IO object.
+
+    # Wraps the input in '<~' and '~>' delimiters and passes it through
+    # unmodified to the underlying IO object otherwise.
+    #
+    # @private
+    #
     class DummyWrapper
       def initialize(out)
         @out = out
@@ -348,9 +355,11 @@ module Ascii85
       end
     end
 
-    # This wraps the input in <~ and ~>-delimiters and makes sure that no line
-    # is longer than +wrap_lines+ columns. The wrapped input is forwarded to the
-    # underlying IO object.
+    # Wraps the input in '<~' and '~>' delimiters and ensures that no line is
+    # longer than the specified length.
+    #
+    # @private
+    #
     class Wrapper
       def initialize(out, wrap_lines)
         @line_length = [2, wrap_lines.to_i].max
@@ -390,23 +399,23 @@ module Ascii85
       end
     end
 
-    # Buffer size for to-be-encoded input
+    # @return [Integer] Buffer size for to-be-encoded input
     def unencoded_chunk_size
       4 * 2048
     end
 
-    # Buffer size for encoded output
+    # @return [Integer] Buffer size for encoded output
     def encoded_chunk_size
       5 * 2048
     end
   end
 
   #
-  # This error is raised when Ascii85 encounters one of the following problems
-  # in the input:
+  # Error raised when Ascii85 encounters problems in the input.
   #
-  # * An invalid character. Valid characters are '!'..'u' and 'z'.
-  # * A 'z' character inside a 5-tuple. 'z's are only valid on their own.
+  # This error is raised for the following issues:  
+  # * An invalid character (valid characters are '!'..'u' and 'z')
+  # * A 'z' character inside a 5-tuple ('z' is only valid on its own)
   # * An invalid 5-tuple that decodes to >= 2**32
   # * The last tuple consisting of a single character. Valid tuples always have
   #   at least two characters.
