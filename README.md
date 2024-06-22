@@ -4,7 +4,7 @@
 
 ## Description
 
-Ascii85 is a simple gem that provides methods for encoding/decoding Adobe's
+Ascii85 is a Ruby gem that provides methods for encoding/decoding Adobe's
 binary-to-text encoding of the same name.
 
 See the Adobe PostScript Language Reference ([archived version][PLRM]) page 131
