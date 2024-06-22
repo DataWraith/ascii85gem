@@ -236,7 +236,6 @@ module Ascii85
       # Decode
       word   = 0
       count  = 0
-      result = []
 
       bufreader.each_chunk do |chunk|
         chunk.each_byte do |c|
