@@ -6,8 +6,17 @@ BREAKING CHANGES:
 
 Other changes:
 
-  * Added `Ascii85#decode_raw`. The new method does not expect the input to be 
-    wrapped in `<~` and `~>` delimiters
+  * Added `Ascii85.decode_raw`. The new method does not expect the input to be 
+    wrapped in `<~` and `~>` delimiters.
+  * Added `Ascii85.extract`. The new method extracts encoded text from between
+    `<~` and `~>` so that it can be fed to `#decode_raw`.
+  * Added option to pass an IO-object as input to `#encode` and `#decode_raw`
+    instead of a String.
+  * Added option to also pass an IO-object to `#encode` and `#decode_raw` for
+    output. Output is written to the object instead of being returned as a String.
+  * If both input and output to `#encode` or `#decode_raw` are IO objects,
+    Ascii85 can now work in a streaming fashion, using constant memory instead
+    of storing the entire input/intermediate results/output in memory.
 
 === 1.1.1 / 2024-05-09
 
