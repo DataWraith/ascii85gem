@@ -53,6 +53,8 @@ module Ascii85
         reader = StringIO.new(str_or_io.to_s, 'rb')
       end
 
+      return ''.dup if reader.eof?
+
       # Setup buffered Reader and Writers
       bufreader = BufferedReader.new(reader, unencoded_chunk_size)
       bufwriter = BufferedWriter.new(out || StringIO.new(String.new, 'wb'), encoded_chunk_size)
@@ -60,11 +62,8 @@ module Ascii85
 
       padding = "\0\0\0\0" 
       tuplebuf = '!!!!!'.dup
-      is_empty = true
 
       bufreader.each_chunk do |chunk|
-        is_empty = false
-        
         chunk.unpack('N*').each do |word|
           # Encode each big-endian 32-bit word into a 5-character tuple (except
           # for 0, which encodes to 'z')
@@ -113,9 +112,6 @@ module Ascii85
           writer.write(tuplebuf[0..(4 - padding_length)])
         end
       end
-
-      # Return an unfrozen String when there is no input.
-      return ''.dup if is_empty
 
       # If no output IO-object was provided, extract the encoded String from the
       # default StringIO writer.
@@ -179,19 +175,41 @@ module Ascii85
     #
     # Decodes the given raw Ascii85-String.
     #
-    # +#decode_raw+ expects an Ascii85-encoded String NOT enclosed in +<~+ and
-    # +~>+. The returned String is always encoded as +ASCII-8BIT+.
+    # +#decode_raw+ expects an Ascii85-encoded String or IO-like object. The
+    # input MUST NOT be enclosed in +<~+ and # +~>+. The returned output is
+    # always encoded as +ASCII-8BIT+.
     #
     #     Ascii85.decode_raw(";KZGo")
     #     => "Ruby"
     #
+    #     input = StringIO.new(";KZGo")
+    #     Ascii85.decode_raw(input)
+    #     => "Ruby"
+    #
+    # You can optionally supply an IO-like object (File handle, StringIO, etc.)
+    # using the +out+ keyword argument. In this case, the output will be written
+    # to that object, and +#decode_raw+ will return this object back to you
+    # instead of returning a String.
+    #
+    #     output = StringIO.new
+    #     Ascii85.decode_raw(";KZGo", out: output)
+    #     => output (with "Ruby" written to it)
+    #
     # Raises Ascii85::DecodingError when malformed input is encountered.
     #
-    def decode_raw(str)
-      input = str.to_s
+    def decode_raw(str_or_io, out: nil)
+      if str_or_io.is_a?(IO)
+        reader = str_or_io
+      else
+        reader = StringIO.new(str_or_io.to_s, 'rb')
+      end
 
       # Return an unfrozen String on empty input
-      return ''.dup if input.empty?
+      return ''.dup if reader.eof?
+
+      # Setup buffered Reader and Writers
+      bufreader = BufferedReader.new(reader, encoded_chunk_size)
+      bufwriter = BufferedWriter.new(out || StringIO.new(String.new, 'wb'), unencoded_chunk_size)
 
       # Populate the lookup table (caches the exponentiation)
       lut = (0..4).map { |count| 85**(4 - count) }
@@ -201,42 +219,44 @@ module Ascii85
       count  = 0
       result = []
 
-      input.each_byte do |c|
-        case c.chr
-        when ' ', "\t", "\r", "\n", "\f", "\0"
-          # Ignore whitespace
-          next
+      bufreader.each_chunk do |chunk|
+        chunk.each_byte do |c|
+          case c.chr
+          when ' ', "\t", "\r", "\n", "\f", "\0"
+            # Ignore whitespace
+            next
 
-        when 'z'
-          raise(Ascii85::DecodingError, "Found 'z' inside Ascii85 5-tuple") unless count.zero?
+          when 'z'
+            raise(Ascii85::DecodingError, "Found 'z' inside Ascii85 5-tuple") unless count.zero?
 
-          # Expand z to 0-word
-          result << 0
+            # Expand z to 0-word
+            bufwriter.write("\0\0\0\0")
 
-        when '!'..'u'
-          # Decode 5 characters into a 4-byte word
-          word  += (c - 33) * lut[count]
-          count += 1
+          when '!'..'u'
+            # Decode 5 characters into a 4-byte word
+            word  += (c - 33) * lut[count]
+            count += 1
 
-          if count == 5 && word > 0xffffffff
-            raise(Ascii85::DecodingError, "Invalid Ascii85 5-tuple (#{word} >= 2**32)")
-          elsif count == 5
-            result << word
+            if count == 5 && word > 0xffffffff
+              raise(Ascii85::DecodingError, "Invalid Ascii85 5-tuple (#{word} >= 2**32)")
+            elsif count == 5
+              bufwriter.write([word].pack('N'))
 
-            word  = 0
-            count = 0
+              word  = 0
+              count = 0
+            end
+
+          else
+            raise(Ascii85::DecodingError, "Illegal character inside Ascii85: #{c.chr.dump}")
           end
-
-        else
-          raise(Ascii85::DecodingError, "Illegal character inside Ascii85: #{c.chr.dump}")
         end
       end
 
-      # Convert result into a String
-      result = result.pack('N*')
-
       # We're done if all 5-tuples have been consumed
-      return result if count.zero?
+      if count.zero?
+        bufwriter.flush
+        return out ? out : bufwriter.io.string
+      end
 
       raise(Ascii85::DecodingError, 'Last 5-tuple consists of single character') if count == 1
 
@@ -244,11 +264,12 @@ module Ascii85
       count -= 1
       word  += lut[count]
 
-      result << ((word >> 24) & 0xff).chr if count >= 1
-      result << ((word >> 16) & 0xff).chr if count >= 2
-      result << ((word >> 8) & 0xff).chr if count == 3
+      bufwriter.write(((word >> 24) & 0xff).chr) if count >= 1
+      bufwriter.write(((word >> 16) & 0xff).chr) if count >= 2
+      bufwriter.write(((word >> 8) & 0xff).chr) if count == 3
+      bufwriter.flush
 
-      result
+      return out ? out : bufwriter.io.string
     end
 
     private
