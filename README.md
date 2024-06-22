@@ -23,7 +23,7 @@ Note that the gem name is capitalized.
 
 ## Usage
 
-```
+```ruby
 require 'ascii85'
 
 Ascii85.encode("Ruby")
