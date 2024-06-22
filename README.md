@@ -8,7 +8,8 @@ Ascii85 is a Ruby gem that provides methods for encoding/decoding Adobe's
 binary-to-text encoding of the same name.
 
 See the Adobe PostScript Language Reference ([archived version][PLRM]) page 131
-and https://en.wikipedia.org/wiki/Ascii85 for more information about the format.
+and [Wikipedia](https://en.wikipedia.org/wiki/Ascii85) for more information
+about the format.
 
 [PLRM]: https://web.archive.org/web/20161222092741/https://www.adobe.com/products/postscript/pdfs/PLRM.pdf
 
