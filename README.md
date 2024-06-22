@@ -51,6 +51,8 @@ The output of `Ascii85.decode` and `Ascii85.decode_raw` will be a String that
 has the `ASCII-8BIT` encoding, so you may have to use `String#force_encoding` to
 convert it to the desired encoding.
 
+For further options, see the [Documentation](https://www.rubydoc.info/gems/Ascii85/).
+
 
 ## Command-line utility
 
