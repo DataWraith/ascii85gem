@@ -18,7 +18,7 @@ module Ascii85
     # Encodes the bytes of the given String or IO object as Ascii85.
     #
     # @param str_or_io [String, IO] The input to encode
-    # @param wrap_lines [Integer, false] The line length for wrapping, or false for no wrapping
+    # @param wrap_lines [Integer, false] The line length for wrapping, or +false+ for no wrapping
     # @param out [IO, nil] An optional IO-like object to write the output to
     #
     # @return [String, IO] The encoded string or the output IO object
@@ -138,7 +138,7 @@ module Ascii85
     #   # => ""
     #
     # @note This method only accepts a String, not an IO-like object, as the entire input
-    #       needs to be buffered to ensure validity.    
+    #       needs to be available to ensure validity.    
     #
     def extract(str)
       input = str.to_s
@@ -170,7 +170,7 @@ module Ascii85
     #   Ascii85.decode("<~;KZGo~>")
     #   # => "Ruby"
     #
-    # @example Decoding with multiple Ascii85 blocks present
+    # @example Decoding with multiple Ascii85 blocks present (ignores all but the first)
     #   Ascii85.decode("Foo<~;KZGo~>Bar<~87cURDZ~>Baz")
     #   # => "Ruby"
     #
@@ -184,7 +184,7 @@ module Ascii85
     #   # => output (with "Ruby" written to it)
     #
     # @note This method only accepts a String, not an IO-like object, as the entire input
-    #       needs to be buffered to ensure validity.    
+    #       needs to be available to ensure validity.    
     #
     def decode(str, out: nil)
       decode_raw(extract(str), out: out)
@@ -293,7 +293,11 @@ module Ascii85
 
     private
 
+    # Buffers an underyling IO object to increase efficiency. You do not need
+    # to use this directly.
+    #
     # @private
+    #
     class BufferedReader
       def initialize(io, buffer_size)
         @io = io
@@ -310,7 +314,11 @@ module Ascii85
       end
     end
 
+    # Buffers an underlying IO object to increase efficiency. You do not need
+    # to use this directly.
+    #
     # @private
+    #
     class BufferedWriter
       attr_accessor :io
 
@@ -333,7 +341,8 @@ module Ascii85
 
 
     # Wraps the input in '<~' and '~>' delimiters and passes it through
-    # unmodified to the underlying IO object otherwise.
+    # unmodified to the underlying IO object otherwise. You do not need to
+    # use this directly.
     #
     # @private
     #
@@ -356,7 +365,7 @@ module Ascii85
     end
 
     # Wraps the input in '<~' and '~>' delimiters and ensures that no line is
-    # longer than the specified length.
+    # longer than the specified length. You do not need to use this directly.
     #
     # @private
     #
@@ -400,11 +409,13 @@ module Ascii85
     end
 
     # @return [Integer] Buffer size for to-be-encoded input
+    #
     def unencoded_chunk_size
       4 * 2048
     end
 
     # @return [Integer] Buffer size for encoded output
+    #
     def encoded_chunk_size
       5 * 2048
     end
