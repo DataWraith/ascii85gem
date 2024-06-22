@@ -133,6 +133,10 @@ module Ascii85
     #     Ascii85.extract("No delimiters")
     #     => ""
     #
+    # NOTE that +#extract+ takes a String only, not an IO-like object. This is
+    #      because the entire String up to the +~>+ delimiter would have to be
+    #      buffered in order to ascertain validity of the input anyway.
+    #
     def extract(str)
       input = str.to_s
 
@@ -166,10 +170,24 @@ module Ascii85
     #     Ascii85.decode("No delimiters")
     #     => ""
     #
+    # NOTE that +#decode+ takes a String only, not an IO-like object. This
+    # is because the entire String up to the +~>+ delimiter would have to be
+    # buffered anyway in order to tell whether or not the stream is valid. If
+    # you already have a raw Ascii85-encoded String, use +#decode_raw+ instead.
+    #
+    # You can optionally supply an IO-like object (File handle, StringIO, etc.)
+    # using the +out+ keyword argument. In this case, the output will be written
+    # to that object, and +#decode+ will return this object back to you instead
+    # of returning a String.
+    #
+    #     output = StringIO.new
+    #     Ascii85.decode("<~;KZGo~>", out: output)
+    #     => output (with "Ruby" written to it)
+    #
     # Raises Ascii85::DecodingError when malformed input is encountered.
     #
-    def decode(str)
-      decode_raw(extract(str))
+    def decode(str, out: nil)
+      decode_raw(extract(str), out: out)
     end
 
     #
@@ -310,6 +328,8 @@ module Ascii85
       end
     end
 
+    # This wraps the input in <~ and ~>-delimiters and otherwise passes the
+    # input through unmodified to the underyling IO object.
     class DummyWrapper
       def initialize(out)
         @out = out
@@ -328,6 +348,9 @@ module Ascii85
       end
     end
 
+    # This wraps the input in <~ and ~>-delimiters and makes sure that no line
+    # is longer than +wrap_lines+ columns. The wrapped input is forwarded to the
+    # underlying IO object.
     class Wrapper
       def initialize(out, wrap_lines)
         @line_length = [2, wrap_lines.to_i].max
@@ -361,16 +384,18 @@ module Ascii85
         # Add the closing delimiter (may need to be pushed to the next line)
         @out.write("\n") if @cur_len + 2 > @line_length
         @out.write('~>')
-        @out.flush
 
+        @out.flush
         @out
       end
     end
 
+    # Buffer size for to-be-encoded input
     def unencoded_chunk_size
       4 * 2048
     end
 
+    # Buffer size for encoded output
     def encoded_chunk_size
       5 * 2048
     end
