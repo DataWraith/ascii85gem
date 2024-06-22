@@ -15,7 +15,7 @@ require 'stringio'
 module Ascii85
   class << self
     #
-    # Encodes the bytes of the given String as Ascii85.
+    # Encodes the bytes of the given String or IO object as Ascii85.
     #
     # If +wrap_lines+ evaluates to +false+, the output will be returned as a
     # single long line. Otherwise +#encode+ formats the output into lines of
@@ -33,27 +33,41 @@ module Ascii85
     #     Ascii85.encode("Supercalifragilisticexpialidocious", false)
     #     => <~;g!%jEarNoBkDBoB5)0rF*),+AU&0.@;KXgDe!L"F`R~>
     #
+    #     input = StringIO.new("Ruby")
+    #     Ascii85.encode(input)
+    #     => "<~;KZGo~>"
     #
-    def encode(str, wrap_lines = 80, out: nil)
-      if str.is_a?(IO)
-        reader = str
+    # You can optionally supply an IO-like object (File handle, StringIO, etc.)
+    # using the +out+ keyword argument. In this case, the output will be written
+    # to that object, and +#encode+ will return this object back to you instead
+    # of returning a String.
+    #
+    #     output = StringIO.new
+    #     Ascii85.encode("Ruby", out: output)
+    #     => output (with "<~;KZGo~>" written to it)
+    #
+    def encode(str_or_io, wrap_lines = 80, out: nil)
+      if str_or_io.is_a?(IO)
+        reader = str_or_io
       else
-        reader = StringIO.new(str.to_s, 'rb')
+        reader = StringIO.new(str_or_io.to_s, 'rb')
       end
 
+      # Setup buffered Reader and Writers
       bufreader = BufferedReader.new(reader, unencoded_chunk_size)
       bufwriter = BufferedWriter.new(out || StringIO.new(String.new, 'wb'), encoded_chunk_size)
-
-      padding = "\0" * 4
-      tuplebuf = '!!!!!'.dup
-
       writer = wrap_lines ? Wrapper.new(bufwriter, wrap_lines) : DummyWrapper.new(bufwriter)
 
+      padding = "\0\0\0\0" 
+      tuplebuf = '!!!!!'.dup
       is_empty = true
+
       bufreader.each_chunk do |chunk|
         is_empty = false
         
         chunk.unpack('N*').each do |word|
+          # Encode each big-endian 32-bit word into a 5-character tuple (except
+          # for 0, which encodes to 'z')
           if word.zero?
             writer.write('z')
           else
@@ -75,11 +89,12 @@ module Ascii85
 
         next if (chunk.bytesize & 0b11).zero?
 
+        # If we have leftover bytes, we need to zero-pad to a multiple of four
         padding_length = (-chunk.bytesize) % 4
-
         trailing = chunk[-(4 - padding_length)..]
         word =  (trailing + padding[0...padding_length]).unpack1('N')
 
+        # Encode the last word and cut off any padding
         if word.zero?
           writer.write('!!!!!'[0..(4 - padding_length)])
         else
@@ -99,9 +114,14 @@ module Ascii85
         end
       end
 
+      # Return an unfrozen String when there is no input.
       return ''.dup if is_empty
+
+      # If no output IO-object was provided, extract the encoded String from the
+      # default StringIO writer.
       return writer.finish.io.string if out.nil?
 
+      # Otherwise we make sure to flush the output writer, and then return it.
       writer.finish
     end
 
