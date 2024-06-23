@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'rubygems'
 require 'minitest/autorun'
 require 'stringio'
 
@@ -50,13 +49,13 @@ describe Ascii85 do
     encoded = Ascii85.encode(test_str)
     decoded = Ascii85.decode(encoded)
 
-    assert_equal decoded, test_str
+    assert_equal test_str, decoded
   end
 
   describe '#encode' do
     it 'should encode all specified test-cases correctly' do
       TEST_CASES.each_pair do |input, encoded|
-        assert_equal Ascii85.encode(input), encoded
+        assert_equal encoded, Ascii85.encode(input)
       end
     end
 
@@ -64,7 +63,7 @@ describe Ascii85 do
       input_euc_jp = 'どうもありがとうミスターロボット'.encode('EUC-JP')
       input_binary = input_euc_jp.force_encoding('ASCII-8BIT')
 
-      assert_equal Ascii85.encode(input_euc_jp), Ascii85.encode(input_binary)
+      assert_equal Ascii85.encode(input_binary), Ascii85.encode(input_euc_jp)
     end
 
     it 'should produce output lines no longer than specified' do
@@ -73,7 +72,7 @@ describe Ascii85 do
       #
       # No wrap
       #
-      assert_equal Ascii85.encode(test_str, false).count("\n"), 0
+      assert_equal 0, Ascii85.encode(test_str, false).count("\n")
 
       #
       # x characters per line, except for the last one
@@ -103,20 +102,20 @@ describe Ascii85 do
     end
 
     it 'should not split the end-marker to achieve correct line length' do
-      assert_equal Ascii85.encode("\0" * 4, 4), "<~z\n~>"
+      assert_equal "<~z\n~>", Ascii85.encode("\0" * 4, 4)
     end
 
     it 'should encode to an IO object when provided' do
       output = StringIO.new
       result = Ascii85.encode('Ruby', out: output)
-      assert_equal result, output
-      assert_equal output.string, '<~;KZGo~>'
+      assert_equal output, result
+      assert_equal '<~;KZGo~>', output.string
     end
 
     it 'should encode from an IO object' do
       input = StringIO.new('Ruby')
       result = Ascii85.encode(input)
-      assert_equal result, '<~;KZGo~>'
+      assert_equal '<~;KZGo~>', result
     end
   end
 
@@ -128,15 +127,15 @@ describe Ascii85 do
       assert_empty Ascii85.extract('Mismatched <~   delimiters 2')
       assert_empty Ascii85.extract('Mismatched ~><~ delimiters 3')
 
-      assert_equal Ascii85.extract('<~;KZGo~><~z~>'),    ';KZGo'
-      assert_equal Ascii85.extract('FooBar<~z~>BazQux'), 'z'
+      assert_equal ';KZGo', Ascii85.extract('<~;KZGo~><~z~>')
+      assert_equal 'z',     Ascii85.extract('FooBar<~z~>BazQux')
     end
   end
 
   describe '#decode' do
     it 'should decode all specified test-cases correctly' do
       TEST_CASES.each_pair do |decoded, input|
-        assert_equal Ascii85.decode(input), decoded.dup.force_encoding('ASCII-8BIT')
+        assert_equal decoded.dup.force_encoding('ASCII-8BIT'), Ascii85.decode(input)
       end
     end
 
@@ -157,7 +156,7 @@ describe Ascii85 do
 
         begin
           to_test = input_ascii85.encode(encoding)
-          assert_equal Ascii85.decode(to_test).force_encoding('UTF-8'), input
+          assert_equal input, Ascii85.decode(to_test).force_encoding('UTF-8')
         rescue Encoding::ConverterNotFoundError
           # Ignore this encoding
         end
@@ -171,24 +170,24 @@ describe Ascii85 do
       assert_empty Ascii85.decode('Mismatched <~   delimiters 2')
       assert_empty Ascii85.decode('Mismatched ~><~ delimiters 3')
 
-      assert_equal Ascii85.decode('<~;KZGo~><~z~>'),    'Ruby'
-      assert_equal Ascii85.decode('FooBar<~z~>BazQux'), "\0\0\0\0"
+      assert_equal 'Ruby',     Ascii85.decode('<~;KZGo~><~z~>')
+      assert_equal "\0\0\0\0", Ascii85.decode('FooBar<~z~>BazQux')
     end
 
     it 'should ignore whitespace' do
       decoded = Ascii85.decode("<~6   #LdYA\r\08\n  \n\n- *rF*(i\"Ch[s \t(D.RU,@ <-\'jDJ=0\f/~>")
-      assert_equal decoded, 'Antidisestablishmentarianism'
+      assert_equal 'Antidisestablishmentarianism', decoded
     end
 
     it 'should return ASCII-8BIT encoded strings' do
-      assert_equal Ascii85.decode('<~;KZGo~>').encoding.name, 'ASCII-8BIT'
+      assert_equal 'ASCII-8BIT', Ascii85.decode('<~;KZGo~>').encoding.name
     end
 
     it 'should decode to an IO object when provided' do
       output = StringIO.new
       result = Ascii85.decode('<~;KZGo~>', out: output)
-      assert_equal result, output
-      assert_equal output.string, 'Ruby'
+      assert_equal output, result
+      assert_equal 'Ruby', output.string
     end
 
     describe 'Error conditions' do
@@ -214,21 +213,21 @@ describe Ascii85 do
     it 'should decode raw Ascii85 without delimiters' do
       TEST_CASES.each_pair do |decoded, input|
         raw_input = input[2...-2] # Remove '<~' and '~>'
-        assert_equal Ascii85.decode_raw(raw_input), decoded.dup.force_encoding('ASCII-8BIT')
+        assert_equal decoded.dup.force_encoding('ASCII-8BIT'), Ascii85.decode_raw(raw_input)
       end
     end
 
     it 'should decode from an IO object' do
       input = StringIO.new(';KZGo')
       result = Ascii85.decode_raw(input)
-      assert_equal result, 'Ruby'
+      assert_equal 'Ruby', result
     end
 
     it 'should decode to an IO object when provided' do
       output = StringIO.new
       result = Ascii85.decode_raw(';KZGo', out: output)
-      assert_equal result, output
-      assert_equal output.string, 'Ruby'
+      assert_equal output, result
+      assert_equal 'Ruby', output.string
     end
 
     it 'should raise DecodingError for invalid input' do
