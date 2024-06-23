@@ -238,4 +238,3 @@ describe Ascii85 do
     end
   end
 end
-

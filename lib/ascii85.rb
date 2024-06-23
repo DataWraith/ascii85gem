@@ -44,14 +44,14 @@ module Ascii85
     # @example Encoding to an IO object
     #   output = StringIO.new
     #   Ascii85.encode("Ruby", out: output)
-    #   # => output (with "<~;KZGo~>" written to it)    
+    #   # => output (with "<~;KZGo~>" written to it)
     #
     def encode(str_or_io, wrap_lines = 80, out: nil)
-      if io_like?(str_or_io)
-        reader = str_or_io
-      else
-        reader = StringIO.new(str_or_io.to_s, 'rb')
-      end
+      reader = if io_like?(str_or_io)
+                 str_or_io
+               else
+                 StringIO.new(str_or_io.to_s, 'rb')
+               end
 
       return ''.dup if reader.eof?
 
@@ -60,7 +60,7 @@ module Ascii85
       bufwriter = BufferedWriter.new(out || StringIO.new(String.new, 'wb'), encoded_chunk_size)
       writer = wrap_lines ? Wrapper.new(bufwriter, wrap_lines) : DummyWrapper.new(bufwriter)
 
-      padding = "\0\0\0\0" 
+      padding = "\0\0\0\0"
       tuplebuf = '!!!!!'.dup
 
       bufreader.each_chunk do |chunk|
@@ -74,7 +74,7 @@ module Ascii85
             word, b1 = word.divmod(85)
             word, b2 = word.divmod(85)
             word, b3 = word.divmod(85)
-            b4 = word 
+            b4 = word
 
             tuplebuf.setbyte(0, b4 + 33)
             tuplebuf.setbyte(1, b3 + 33)
@@ -91,7 +91,7 @@ module Ascii85
         # If we have leftover bytes, we need to zero-pad to a multiple of four
         padding_length = (-chunk.bytesize) % 4
         trailing = chunk[-(4 - padding_length)..]
-        word =  (trailing + padding[0...padding_length]).unpack1('N')
+        word = (trailing + padding[0...padding_length]).unpack1('N')
 
         # Encode the last word and cut off any padding
         if word.zero?
@@ -101,7 +101,7 @@ module Ascii85
           word, b1 = word.divmod(85)
           word, b2 = word.divmod(85)
           word, b3 = word.divmod(85)
-          b4 = word 
+          b4 = word
 
           tuplebuf.setbyte(0, b4 + 33)
           tuplebuf.setbyte(1, b3 + 33)
@@ -136,7 +136,7 @@ module Ascii85
     #   # => ""
     #
     # @note This method only accepts a String, not an IO-like object, as the entire input
-    #       needs to be available to ensure validity.    
+    #       needs to be available to ensure validity.
     #
     def extract(str)
       input = str.to_s
@@ -182,7 +182,7 @@ module Ascii85
     #   # => output (with "Ruby" written to it)
     #
     # @note This method only accepts a String, not an IO-like object, as the entire input
-    #       needs to be available to ensure validity.    
+    #       needs to be available to ensure validity.
     #
     def decode(str, out: nil)
       decode_raw(extract(str), out: out)
@@ -212,14 +212,14 @@ module Ascii85
     #   Ascii85.decode_raw(";KZGo", out: output)
     #   # => output (with "Ruby" written to it)
     #
-    # @note The input must not be enclosed in '<~' and '~>' delimiters.    
+    # @note The input must not be enclosed in '<~' and '~>' delimiters.
     #
     def decode_raw(str_or_io, out: nil)
-      if io_like?(str_or_io)
-        reader = str_or_io
-      else
-        reader = StringIO.new(str_or_io.to_s, 'rb')
-      end
+      reader = if io_like?(str_or_io)
+                 str_or_io
+               else
+                 StringIO.new(str_or_io.to_s, 'rb')
+               end
 
       # Return an unfrozen String on empty input
       return ''.dup if reader.eof?
@@ -271,7 +271,7 @@ module Ascii85
       # We're done if all 5-tuples have been consumed
       if count.zero?
         bufwriter.flush
-        return out ? out : bufwriter.io.string
+        return out || bufwriter.io.string
       end
 
       raise(Ascii85::DecodingError, 'Last 5-tuple consists of single character') if count == 1
@@ -285,7 +285,7 @@ module Ascii85
       bufwriter.write(((word >> 8) & 0xff).chr) if count == 3
       bufwriter.flush
 
-      return out ? out : bufwriter.io.string
+      out || bufwriter.io.string
     end
 
     private
@@ -335,7 +335,6 @@ module Ascii85
         @buffer.clear
       end
     end
-
 
     # Wraps the input in '<~' and '~>' delimiters and passes it through
     # unmodified to the underlying IO object otherwise. You do not need to
@@ -406,12 +405,12 @@ module Ascii85
     end
 
     # Check if an object is IO-like
-    # 
+    #
     # @private
     #
     def io_like?(obj)
       obj.respond_to?(:read) &&
-      obj.respond_to?(:eof?)
+        obj.respond_to?(:eof?)
     end
 
     # @return [Integer] Buffer size for to-be-encoded input
@@ -430,7 +429,7 @@ module Ascii85
   #
   # Error raised when Ascii85 encounters problems in the input.
   #
-  # This error is raised for the following issues:  
+  # This error is raised for the following issues:
   # * An invalid character (valid characters are '!'..'u' and 'z')
   # * A 'z' character inside a 5-tuple ('z' is only valid on its own)
   # * An invalid 5-tuple that decodes to >= 2**32

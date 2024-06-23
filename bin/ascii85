@@ -68,10 +68,10 @@ end
 
 if @options[:decode]
   begin
-    Ascii85.decode(@input, out: STDOUT)
+    Ascii85.decode(@input, out: $stdout)
   rescue Ascii85::DecodingError => e
     abort "Decoding Error: #{e.message}"
   end
 else
-  Ascii85.encode(@input, @options[:wrap], out: STDOUT)
+  Ascii85.encode(@input, @options[:wrap], out: $stdout)
 end
