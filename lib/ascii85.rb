@@ -15,15 +15,15 @@ require 'stringio'
 module Ascii85
   class << self
     #
-    # Encodes the bytes of the given String or IO object as Ascii85.
+    # Encodes the bytes of the given String or IO-like object as Ascii85.
     #
     # @param str_or_io [String, IO] The input to encode
     # @param wrap_lines [Integer, false] The line length for wrapping, or +false+ for no wrapping
     # @param out [IO, nil] An optional IO-like object to write the output to
     #
-    # @return [String, IO] The encoded string or the output IO object
+    # @return [String, IO] The encoded String or the output IO object that was passed in
     #
-    # @example Encoding a simple string
+    # @example Encoding a simple String
     #   Ascii85.encode("Ruby")
     #   # => <~;KZGo~>
     #
@@ -38,7 +38,7 @@ module Ascii85
     #   Ascii85.encode("Supercalifragilisticexpialidocious", false)
     #   # => <~;g!%jEarNoBkDBoB5)0rF*),+AU&0.@;KXgDe!L"F`R~>
     #
-    # @example Encoding from an IO object
+    # @example Encoding from an IO-like object
     #   input = StringIO.new("Ruby")
     #   Ascii85.encode(input)
     #   # => "<~;KZGo~>"
@@ -124,11 +124,11 @@ module Ascii85
       writer.finish.io
     end
 
-    # Searches through a string and extracts the first substring enclosed by '<~' and '~>'.
+    # Searches through a String and extracts the first substring enclosed by '<~' and '~>'.
     #
-    # @param str [String] The string to search through
+    # @param str [String] The String to search through
     #
-    # @return [String] The extracted substring, or an empty string if no valid delimiters are found
+    # @return [String] The extracted substring, or an empty String if no valid delimiters are found
     #
     # @example Extracting Ascii85 content
     #   Ascii85.extract("Foo<~;KZGo~>Bar<~z~>Baz")
@@ -144,26 +144,26 @@ module Ascii85
     def extract(str)
       input = str.to_s
 
-      # Make sure the delimiter strings have the correct encoding.
+      # Make sure the delimiter Strings have the correct encoding.
       opening_delim = '<~'.encode(input.encoding)
       closing_delim = '~>'.encode(input.encoding)
 
       # Get the positions of the opening/closing delimiters. If there is no pair
-      # of opening/closing delimiters, return an unfrozen empty string.
+      # of opening/closing delimiters, return an unfrozen empty String.
       (start_pos = input.index(opening_delim))                or return ''.dup
       (end_pos   = input.index(closing_delim, start_pos + 2)) or return ''.dup
 
-      # Get the string inside the delimiter-pair
+      # Get the String inside the delimiter-pair
       input[(start_pos + 2)...end_pos]
     end
 
     #
-    # Searches through a string and decodes the first substring enclosed by '<~' and '~>'.
+    # Searches through a String and decodes the first substring enclosed by '<~' and '~>'.
     #
-    # @param str [String] The string containing Ascii85-encoded content
+    # @param str [String] The String containing Ascii85-encoded content
     # @param out [IO, nil] An optional IO-like object to write the output to
     #
-    # @return [String, IO] The decoded string (in ASCII-8BIT encoding) or the output IO object
+    # @return [String, IO] The decoded String (in ASCII-8BIT encoding) or the output IO object (if it was provided)
     #
     # @raise [Ascii85::DecodingError] When malformed input is encountered
     #
@@ -192,20 +192,20 @@ module Ascii85
     end
 
     #
-    # Decodes the given raw Ascii85-encoded string or IO-like object.
+    # Decodes the given raw Ascii85-encoded String or IO-like object.
     #
     # @param str_or_io [String, IO] The Ascii85-encoded input to decode
     # @param out [IO, nil] An optional IO-like object to write the output to
     #
-    # @return [String, IO] The decoded string (in ASCII-8BIT encoding) or the output IO object
+    # @return [String, IO] The decoded String (in ASCII-8BIT encoding) or the output IO object (if it was provided)
     #
     # @raise [Ascii85::DecodingError] When malformed input is encountered
     #
-    # @example Decoding a raw Ascii85 string
+    # @example Decoding a raw Ascii85 String
     #   Ascii85.decode_raw(";KZGo")
     #   # => "Ruby"
     #
-    # @example Decoding from an IO object
+    # @example Decoding from an IO-like object
     #   input = StringIO.new(";KZGo")
     #   Ascii85.decode_raw(input)
     #   # => "Ruby"
@@ -304,7 +304,7 @@ module Ascii85
 
     private
 
-    # Buffers an underyling IO object to increase efficiency. You do not need
+    # Buffers an underlying IO object to increase efficiency. You do not need
     # to use this directly.
     #
     # @private
@@ -441,7 +441,7 @@ module Ascii85
   end
 
   #
-  # Error raised when Ascii85 encounters problems in the input.
+  # Error raised when Ascii85 encounters problems while decoding the input.
   #
   # This error is raised for the following issues:
   # * An invalid character (valid characters are '!'..'u' and 'z')
