@@ -18,7 +18,8 @@ about the format.
 
 `$ gem install Ascii85`
 
-Note that the gem name is capitalized.
+> [!IMPORTANT]
+> Note that the gem name is capitalized.
 
 
 ## Usage
