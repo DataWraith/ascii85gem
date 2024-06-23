@@ -2,6 +2,7 @@
 
 require 'rubygems'
 require 'minitest/autorun'
+require 'stringio'
 
 # Require implementation
 require File.expand_path('../../lib/ascii85', __dir__)

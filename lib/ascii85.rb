@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'stringio'
+
 #
 # Ascii85 is an implementation of Adobe's binary-to-text encoding of the
 # same name in pure Ruby.
