@@ -89,6 +89,7 @@ module Ascii85
         next if (chunk.bytesize & 0b11).zero?
 
         # If we have leftover bytes, we need to zero-pad to a multiple of four
+        # before converting to a 32-bit word.
         padding_length = (-chunk.bytesize) % 4
         trailing = chunk[-(4 - padding_length)..]
         word = (trailing + padding[0...padding_length]).unpack1('N')
@@ -234,6 +235,7 @@ module Ascii85
       # Decode
       word   = 0
       count  = 0
+      wordbuf = "\0\0\0\0".dup
 
       bufreader.each_chunk do |chunk|
         chunk.each_byte do |c|
@@ -256,7 +258,17 @@ module Ascii85
             if count == 5 && word > 0xffffffff
               raise(Ascii85::DecodingError, "Invalid Ascii85 5-tuple (#{word} >= 2**32)")
             elsif count == 5
-              bufwriter.write([word].pack('N'))
+              b3 = word & 0xff; word >>= 8
+              b2 = word & 0xff; word >>= 8
+              b1 = word & 0xff; word >>= 8
+              b0 = word
+
+              wordbuf.setbyte(0, b0)
+              wordbuf.setbyte(1, b1)
+              wordbuf.setbyte(2, b2)
+              wordbuf.setbyte(3, b3)
+
+              bufwriter.write(wordbuf)
 
               word  = 0
               count = 0
@@ -280,7 +292,7 @@ module Ascii85
       count -= 1
       word  += lut[count]
 
-      bufwriter.write(((word >> 24) & 0xff).chr) if count >= 1
+      bufwriter.write((word >> 24).chr) if count >= 1
       bufwriter.write(((word >> 16) & 0xff).chr) if count >= 2
       bufwriter.write(((word >> 8) & 0xff).chr) if count == 3
       bufwriter.flush
