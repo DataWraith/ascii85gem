@@ -68,7 +68,7 @@ end
 
 if @options[:decode]
   begin
-    Ascii85.decode(@input.read, out: STDOUT)
+    Ascii85.decode(@input, out: STDOUT)
   rescue Ascii85::DecodingError => e
     abort "Decoding Error: #{e.message}"
   end
