@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'stringio'
-
 #
 # Ascii85 is an implementation of Adobe's binary-to-text encoding of the
 # same name in pure Ruby.
@@ -49,7 +47,7 @@ module Ascii85
     #   # => output (with "<~;KZGo~>" written to it)    
     #
     def encode(str_or_io, wrap_lines = 80, out: nil)
-      if str_or_io.is_a?(IO)
+      if io_like?(str_or_io)
         reader = str_or_io
       else
         reader = StringIO.new(str_or_io.to_s, 'rb')
@@ -120,7 +118,7 @@ module Ascii85
       return writer.finish.io.string if out.nil?
 
       # Otherwise we make sure to flush the output writer, and then return it.
-      writer.finish
+      writer.finish.io
     end
 
     # Searches through a string and extracts the first substring enclosed by '<~' and '~>'.
@@ -217,7 +215,7 @@ module Ascii85
     # @note The input must not be enclosed in '<~' and '~>' delimiters.    
     #
     def decode_raw(str_or_io, out: nil)
-      if str_or_io.is_a?(IO)
+      if io_like?(str_or_io)
         reader = str_or_io
       else
         reader = StringIO.new(str_or_io.to_s, 'rb')
@@ -405,6 +403,15 @@ module Ascii85
         @out.flush
         @out
       end
+    end
+
+    # Check if an object is IO-like
+    # 
+    # @private
+    #
+    def io_like?(obj)
+      obj.respond_to?(:read) &&
+      obj.respond_to?(:eof?)
     end
 
     # @return [Integer] Buffer size for to-be-encoded input
