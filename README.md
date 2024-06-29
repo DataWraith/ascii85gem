@@ -68,7 +68,7 @@ Encodes or decodes FILE or STDIN using Ascii85 and writes to STDOUT.
     -w, --wrap COLUMN                Wrap lines at COLUMN. Default is 80, use 0 for no wrapping
     -d, --decode                     Decode the input
     -h, --help                       Display this help and exit
-        --version                    Output version information
+    -V, --version                    Output version information
 ```
 
 
