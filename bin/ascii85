@@ -11,7 +11,12 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'ascii85')
 require File.join(File.dirname(__FILE__), '..', 'lib', 'Ascii85', 'version')
 
 class CLI
-  def initialize(argv)
+  attr_reader :options
+
+  def initialize(argv, stdin: $stdin, stdout: $stdout)
+    @in = stdin
+    @out = stdout
+
     @options = {
       wrap: 80,
       action: :encode
@@ -43,25 +48,24 @@ class CLI
         @options[:action] = :version
       end
 
-      remaining_args = opts.parse!
-
-      case remaining_args.size
-      when 0
-        @options[:file] = '-'
-      when 1
-        @options[:file] = remaining_args.first
-      else
-        raise(OptionParser::ParseError, "Superfluous operand(s): \"#{remaining_args[1..].join('", "')}\"")
-      end
     end
 
-    @parser.parse!(argv)
+    remaining_args = @parser.parse!(argv)
+
+    case remaining_args.size
+    when 0
+      @options[:file] = '-'
+    when 1
+      @options[:file] = remaining_args.first
+    else
+      raise(OptionParser::ParseError, "Superfluous operand(s): \"#{remaining_args[1..].join('", "')}\"")
+    end
   end
   
   def input
     fn = @options[:file]
 
-    return $stdin.binmode if fn == '-'
+    return @in.binmode if fn == '-'
 
     raise(StandardError, "File not found: \"#{fn}\"") unless File.exist?(fn)
     raise(StandardError, "File is not readable: \"#{fn}\"") unless File.readable_real?(fn)
@@ -70,37 +74,39 @@ class CLI
   end
 
   def decode
-    Ascii85.decode(input.read, out: $stdout)
+    Ascii85.decode(input.read, out: @out)
   end
 
   def encode
-    Ascii85.encode(input, @options[:wrap], out: $stdout)
+    Ascii85.encode(input, @options[:wrap], out: @out)
   end
 
   def version 
-    puts "Ascii85 v#{Ascii85::VERSION},\nwritten by Johannes Holzfuß"
+    "Ascii85 v#{Ascii85::VERSION},\nwritten by Johannes Holzfuß"
   end
 
   def help
-    puts @parser
+    @parser
   end
 
   def call
     case @options[:action]
-    when :help then help
-    when :version then version
+    when :help then @out.puts help
+    when :version then @out.puts version
     when :encode then encode
     when :decode then decode
     end
   end
 end
 
-begin
-  CLI.new(ARGV).call
-rescue OptionParser::ParseError => e
-  abort e.message
-rescue Ascii85::DecodingError => e
-  abort "Decoding Error: #{e.message}"
-rescue StandardError => e
-  abort "Error: #{e.message}"
+if $PROGRAM_NAME == __FILE__
+  begin
+    CLI.new(ARGV).call
+  rescue OptionParser::ParseError => e
+    abort e.message
+  rescue Ascii85::DecodingError => e
+    abort "Decoding Error: #{e.message}"
+  rescue StandardError => e
+    abort "Error: #{e.message}"
+  end
 end
