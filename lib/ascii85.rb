@@ -117,7 +117,8 @@ module Ascii85
       end
 
       # If no output IO-object was provided, extract the encoded String from the
-      # default StringIO writer.
+      # default StringIO writer. We force the encoding to 'ASCII-8BIT' to work
+      # around a TruffleRuby bug.
       return writer.finish.io.string.force_encoding('ASCII-8BIT') if out.nil?
 
       # Otherwise we make sure to flush the output writer, and then return it.
@@ -299,7 +300,7 @@ module Ascii85
       bufwriter.write(((word >> 8) & 0xff).chr) if count == 3
       bufwriter.flush
 
-      out || bufwriter.io.string
+      out || bufwriter.io.string.force_encoding('ASCII-8BIT')
     end
 
     private
