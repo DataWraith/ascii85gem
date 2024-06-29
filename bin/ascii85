@@ -12,6 +12,7 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'Ascii85', 'version')
 
 class CLI
   def initialize(argv)
+    @exit = false
     @options = {
       wrap: 80,
       decode: false
@@ -43,12 +44,12 @@ class CLI
 
       opts.on('-h', '--help', 'Display this help and exit') do
         puts opts
-        exit
+        @exit = true
       end
 
       opts.on('--version', 'Output version information') do |_opt|
         puts "Ascii85 v#{Ascii85::VERSION},\nwritten by Johannes Holzfuß"
-        exit
+        @exit = true
       end
 
       remaining_args = opts.parse!
@@ -88,6 +89,7 @@ class CLI
   end
 
   def call
+    return if @exit
     @options[:decode] ? decode : encode
   end
 end
