@@ -19,16 +19,10 @@ class CLI
     }
 
     parse_options(argv)
-
-    # When opt_parse fails, it will raise an Exception that prints an error message,
-    # but the program will continue running. However, @options[:file] will not be
-    # set, so we can detect this condition and simply exit with an error status
-    # code while OptParse prints out the error message.
-    raise(SystemExit, 1) if @options[:file].nil?
   end
 
   def parse_options(argv)
-    argv.options do |opts|
+    OptionParser.new do |opts|
       opts.banner = "Usage: #{File.basename($PROGRAM_NAME)} [OPTIONS] [FILE]\n" \
                     'Encodes or decodes FILE or STDIN using Ascii85 and writes to STDOUT.'
 
@@ -47,7 +41,7 @@ class CLI
         @exit = true
       end
 
-      opts.on('--version', 'Output version information') do |_opt|
+      opts.on('-V', '--version', 'Output version information') do |_opt|
         puts "Ascii85 v#{Ascii85::VERSION},\nwritten by Johannes Holzfuß"
         @exit = true
       end
@@ -60,9 +54,9 @@ class CLI
       when 1
         @options[:file] = remaining_args.first
       else
-        abort "Superfluous operand(s): \"#{remaining_args[1..].join('", "')}\""
+        raise(OptionParser::ParseError, "Superfluous operand(s): \"#{remaining_args[1..].join('", "')}\"")
       end
-    end
+    end.parse!(argv)
   end
   
   def input
@@ -77,11 +71,7 @@ class CLI
   end
 
   def decode
-    begin
-      Ascii85.decode(input, out: $stdout)
-    rescue Ascii85::DecodingError => e
-      abort "Decoding Error: #{e.message}"
-    end
+    Ascii85.decode(input.read, out: $stdout)
   end
 
   def encode
@@ -94,4 +84,12 @@ class CLI
   end
 end
 
-CLI.new(ARGV).call
+begin
+  CLI.new(ARGV).call
+rescue OptionParser::ParseError => e
+  abort e.message
+rescue Ascii85::DecodingError => e
+  abort "Decoding Error: #{e.message}"
+rescue StandardError => e
+  abort "Error: #{e.message}"
+end
