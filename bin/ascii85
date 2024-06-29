@@ -59,7 +59,7 @@ class CLI
       when 1
         @options[:file] = remaining_args.first
       else
-        abort "Superfluous operand(s): \"#{remaining_args.join('", "')}\""
+        abort "Superfluous operand(s): \"#{remaining_args[1..].join('", "')}\""
       end
     end
   end
