@@ -12,17 +12,16 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'Ascii85', 'version')
 
 class CLI
   def initialize(argv)
-    @exit = false
     @options = {
       wrap: 80,
-      decode: false
+      action: :encode
     }
 
     parse_options(argv)
   end
 
   def parse_options(argv)
-    OptionParser.new do |opts|
+    @parser = OptionParser.new do |opts|
       opts.banner = "Usage: #{File.basename($PROGRAM_NAME)} [OPTIONS] [FILE]\n" \
                     'Encodes or decodes FILE or STDIN using Ascii85 and writes to STDOUT.'
 
@@ -33,17 +32,15 @@ class CLI
       end
 
       opts.on('-d', '--decode', 'Decode the input') do
-        @options[:decode] = true
+        @options[:action] = :decode
       end
 
       opts.on('-h', '--help', 'Display this help and exit') do
-        puts opts
-        @exit = true
+        @options[:action] = :help
       end
 
       opts.on('-V', '--version', 'Output version information') do |_opt|
-        puts "Ascii85 v#{Ascii85::VERSION},\nwritten by Johannes Holzfuß"
-        @exit = true
+        @options[:action] = :version
       end
 
       remaining_args = opts.parse!
@@ -56,7 +53,9 @@ class CLI
       else
         raise(OptionParser::ParseError, "Superfluous operand(s): \"#{remaining_args[1..].join('", "')}\"")
       end
-    end.parse!(argv)
+    end
+
+    @parser.parse!(argv)
   end
   
   def input
@@ -78,9 +77,21 @@ class CLI
     Ascii85.encode(input, @options[:wrap], out: $stdout)
   end
 
+  def version 
+    puts "Ascii85 v#{Ascii85::VERSION},\nwritten by Johannes Holzfuß"
+  end
+
+  def help
+    puts @parser
+  end
+
   def call
-    return if @exit
-    @options[:decode] ? decode : encode
+    case @options[:action]
+    when :help then help
+    when :version then version
+    when :encode then encode
+    when :decode then decode
+    end
   end
 end
 
