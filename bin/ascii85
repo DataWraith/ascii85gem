@@ -99,7 +99,7 @@ class CLI
   end
 end
 
-if $PROGRAM_NAME == __FILE__
+if File.basename($PROGRAM_NAME) == "ascii85"
   begin
     CLI.new(ARGV).call
   rescue OptionParser::ParseError => e
