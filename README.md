@@ -1,4 +1,4 @@
-**Status**: This project is in maintenance mode. I will not develop new features, but I will address Issues and Pull Requests.
+**Status**: This project is feature-complete. With the exception of fixes to reported bugs, no further development will take place.
 
 # Ascii85
 
