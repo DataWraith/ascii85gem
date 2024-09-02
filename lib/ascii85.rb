@@ -62,15 +62,20 @@ module Ascii85
       bufwriter = BufferedWriter.new(out || StringIO.new(String.new, 'wb'), encoded_chunk_size)
       writer = wrap_lines ? Wrapper.new(bufwriter, wrap_lines) : DummyWrapper.new(bufwriter)
 
-      padding = "\0\0\0\0"
-      tuplebuf = '!!!!!'.dup
+      # We need to enforce the encoding here, because this source file is in UTF-8,
+      # but we want ASCII-8BIT output.
+      padding = "\0\0\0\0".dup.force_encoding(Encoding::ASCII_8BIT)
+      tuplebuf = '!!!!!'.dup.force_encoding(Encoding::ASCII_8BIT)
+      
+      exclamations = '!!!!!'.dup.force_encoding(Encoding::ASCII_8BIT)
+      z = 'z'.dup.force_encoding(Encoding::ASCII_8BIT)
 
       bufreader.each_chunk do |chunk|
         chunk.unpack('N*').each do |word|
           # Encode each big-endian 32-bit word into a 5-character tuple (except
           # for 0, which encodes to 'z')
           if word.zero?
-            writer.write('z')
+            writer.write(z)
           else
             word, b0 = word.divmod(85)
             word, b1 = word.divmod(85)
@@ -98,7 +103,7 @@ module Ascii85
 
         # Encode the last word and cut off any padding
         if word.zero?
-          writer.write('!!!!!'[0..(4 - padding_length)])
+          writer.write(exclamations[0..(4 - padding_length)])
         else
           word, b0 = word.divmod(85)
           word, b1 = word.divmod(85)
@@ -238,7 +243,8 @@ module Ascii85
       # Decode
       word   = 0
       count  = 0
-      wordbuf = "\0\0\0\0".dup
+      wordbuf = "\0\0\0\0".dup.force_encoding(Encoding::ASCII_8BIT)
+      zeroes = "\0\0\0\0".dup.force_encoding(Encoding::ASCII_8BIT)
 
       bufreader.each_chunk do |chunk|
         chunk.each_byte do |c|
@@ -251,7 +257,7 @@ module Ascii85
             raise(Ascii85::DecodingError, "Found 'z' inside Ascii85 5-tuple") unless count.zero?
 
             # Expand z to 0-word
-            bufwriter.write("\0\0\0\0")
+            bufwriter.write(zeroes)
 
           when '!'..'u'
             # Decode 5 characters into a 4-byte word
@@ -300,7 +306,7 @@ module Ascii85
       bufwriter.write(((word >> 8) & 0xff).chr) if count == 3
       bufwriter.flush
 
-      out || bufwriter.io.string.force_encoding('ASCII-8BIT')
+      out || bufwriter.io.string.force_encoding(Encoding::ASCII_8BIT)
     end
 
     private
@@ -337,7 +343,7 @@ module Ascii85
       def initialize(io, buffer_size)
         @io = io
         @buffer_size = buffer_size
-        @buffer = String.new(capacity: buffer_size)
+        @buffer = String.new(capacity: buffer_size, encoding: Encoding::ASCII_8BIT)
       end
 
       def write(tuple)
@@ -358,9 +364,12 @@ module Ascii85
     # @private
     #
     class DummyWrapper
+      START = '<~'.dup.force_encoding(Encoding::ASCII_8BIT)
+      ENDING = '~>'.dup.force_encoding(Encoding::ASCII_8BIT)
+
       def initialize(out)
         @out = out
-        @out.write('<~')
+        @out.write(START)
       end
 
       def write(buffer)
@@ -368,7 +377,7 @@ module Ascii85
       end
 
       def finish
-        @out.write('~>')
+        @out.write(ENDING)
         @out.flush
 
         @out
@@ -381,11 +390,15 @@ module Ascii85
     # @private
     #
     class Wrapper
+      LINE_BREAK = 10.chr.force_encoding(Encoding::ASCII_8BIT)
+      START = '<~'.dup.force_encoding(Encoding::ASCII_8BIT)
+      ENDING = '~>'.dup.force_encoding(Encoding::ASCII_8BIT)
+
       def initialize(out, wrap_lines)
         @line_length = [2, wrap_lines.to_i].max
 
         @out = out
-        @out.write('<~')
+        @out.write(START)
 
         @cur_len = 2
       end
@@ -402,7 +415,7 @@ module Ascii85
 
           remaining = @line_length - @cur_len
           @out.write(buffer[0...remaining])
-          @out.write("\n")
+          @out.write(LINE_BREAK)
           @cur_len = 0
           buffer = buffer[remaining..]
           return if buffer.empty?
@@ -411,8 +424,8 @@ module Ascii85
 
       def finish
         # Add the closing delimiter (may need to be pushed to the next line)
-        @out.write("\n") if @cur_len + 2 > @line_length
-        @out.write('~>')
+        @out.write(LINE_BREAK) if @cur_len + 2 > @line_length
+        @out.write(ENDING)
 
         @out.flush
         @out

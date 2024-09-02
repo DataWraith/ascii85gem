@@ -37,8 +37,9 @@ TEST_CASES = {
   [Math::PI].pack('G') => '<~5RAV2<(&;T~>',
   [Math::E].pack('G') => '<~5R"n0M\\K6,~>',
 
-  # Minified example from Github issue 8
-  "\x9B\xB6\xB9+\x91" => '<~S$ojXOU~>'
+  # Minified example from Github issue 8.
+  # Note that OT and OU as the trailing characters are equivalent.
+  "\x9B\xB6\xB9+\x91" => '<~S$ojXOT~>'
 }.freeze
 
 describe Ascii85 do
