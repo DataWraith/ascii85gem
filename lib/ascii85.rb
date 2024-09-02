@@ -119,7 +119,7 @@ module Ascii85
       # If no output IO-object was provided, extract the encoded String from the
       # default StringIO writer. We force the encoding to 'ASCII-8BIT' to work
       # around a TruffleRuby bug.
-      return writer.finish.io.string.force_encoding('ASCII-8BIT') if out.nil?
+      return writer.finish.io.string.force_encoding(Encoding::ASCII_8BIT) if out.nil?
 
       # Otherwise we make sure to flush the output writer, and then return it.
       writer.finish.io
@@ -286,7 +286,7 @@ module Ascii85
       # We're done if all 5-tuples have been consumed
       if count.zero?
         bufwriter.flush
-        return out || bufwriter.io.string.force_encoding('ASCII-8BIT')
+        return out || bufwriter.io.string.force_encoding(Encoding::ASCII_8BIT)
       end
 
       raise(Ascii85::DecodingError, 'Last 5-tuple consists of single character') if count == 1
