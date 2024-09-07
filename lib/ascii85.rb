@@ -14,6 +14,11 @@ require 'stringio'
 #
 module Ascii85
   class << self
+    EMPTY_STRING  = ''.dup.force_encoding(Encoding::ASCII_8BIT)
+    START_MARKER  = '<~'.dup.force_encoding(Encoding::ASCII_8BIT)
+    ENDING_MARKER = '~>'.dup.force_encoding(Encoding::ASCII_8BIT)
+    LINE_BREAK    = "\n".dup.force_encoding(Encoding::ASCII_8BIT)
+
     #
     # Encodes the bytes of the given String or IO-like object as Ascii85.
     #
@@ -55,20 +60,17 @@ module Ascii85
                  StringIO.new(str_or_io.to_s, 'rb')
                end
 
-      return ''.dup if reader.eof?
+      return EMPTY_STRING.dup if reader.eof?
 
       # Setup buffered Reader and Writers
       bufreader = BufferedReader.new(reader, unencoded_chunk_size)
       bufwriter = BufferedWriter.new(out || StringIO.new(String.new, 'wb'), encoded_chunk_size)
       writer = wrap_lines ? Wrapper.new(bufwriter, wrap_lines) : DummyWrapper.new(bufwriter)
 
-      # We need to enforce the encoding here, because this source file is in UTF-8,
-      # but we want ASCII-8BIT output.
-      padding = "\0\0\0\0".dup.force_encoding(Encoding::ASCII_8BIT)
-      tuplebuf = '!!!!!'.dup.force_encoding(Encoding::ASCII_8BIT)
-      
-      exclamations = '!!!!!'.dup.force_encoding(Encoding::ASCII_8BIT)
-      z = 'z'.dup.force_encoding(Encoding::ASCII_8BIT)
+      padding = unfrozen_binary_copy("\0\0\0\0")
+      tuplebuf = unfrozen_binary_copy('!!!!!')
+      exclamations = unfrozen_binary_copy('!!!!!')
+      z = unfrozen_binary_copy('z')
 
       bufreader.each_chunk do |chunk|
         chunk.unpack('N*').each do |word|
@@ -156,8 +158,8 @@ module Ascii85
 
       # Get the positions of the opening/closing delimiters. If there is no pair
       # of opening/closing delimiters, return an unfrozen empty String.
-      (start_pos = input.index(opening_delim))                or return ''.dup
-      (end_pos   = input.index(closing_delim, start_pos + 2)) or return ''.dup
+      (start_pos = input.index(opening_delim))                or return EMPTY_STRING.dup
+      (end_pos   = input.index(closing_delim, start_pos + 2)) or return EMPTY_STRING.dup
 
       # Get the String inside the delimiter-pair
       input[(start_pos + 2)...end_pos]
@@ -231,7 +233,7 @@ module Ascii85
                end
 
       # Return an unfrozen String on empty input
-      return ''.dup if reader.eof?
+      return EMPTY_STRING.dup if reader.eof?
 
       # Setup buffered Reader and Writers
       bufreader = BufferedReader.new(reader, encoded_chunk_size)
@@ -243,8 +245,8 @@ module Ascii85
       # Decode
       word   = 0
       count  = 0
-      wordbuf = "\0\0\0\0".dup.force_encoding(Encoding::ASCII_8BIT)
-      zeroes = "\0\0\0\0".dup.force_encoding(Encoding::ASCII_8BIT)
+      zeroes = unfrozen_binary_copy("\0\0\0\0")
+      wordbuf = zeroes.dup
 
       bufreader.each_chunk do |chunk|
         chunk.each_byte do |c|
@@ -311,6 +313,12 @@ module Ascii85
 
     private
 
+    # Copies the given String and forces the encoding of the returned copy to
+    # be Encoding::ASCII_8BIT.
+    def unfrozen_binary_copy(str)
+      str.dup.force_encoding(Encoding::ASCII_8BIT)
+    end
+
     # Buffers an underlying IO object to increase efficiency. You do not need
     # to use this directly.
     #
@@ -364,12 +372,9 @@ module Ascii85
     # @private
     #
     class DummyWrapper
-      START = '<~'.dup.force_encoding(Encoding::ASCII_8BIT)
-      ENDING = '~>'.dup.force_encoding(Encoding::ASCII_8BIT)
-
       def initialize(out)
         @out = out
-        @out.write(START)
+        @out.write(START_MARKER)
       end
 
       def write(buffer)
@@ -377,7 +382,7 @@ module Ascii85
       end
 
       def finish
-        @out.write(ENDING)
+        @out.write(ENDING_MARKER)
         @out.flush
 
         @out
@@ -390,15 +395,11 @@ module Ascii85
     # @private
     #
     class Wrapper
-      LINE_BREAK = 10.chr.force_encoding(Encoding::ASCII_8BIT)
-      START = '<~'.dup.force_encoding(Encoding::ASCII_8BIT)
-      ENDING = '~>'.dup.force_encoding(Encoding::ASCII_8BIT)
-
       def initialize(out, wrap_lines)
         @line_length = [2, wrap_lines.to_i].max
 
         @out = out
-        @out.write(START)
+        @out.write(START_MARKER)
 
         @cur_len = 2
       end
@@ -425,7 +426,7 @@ module Ascii85
       def finish
         # Add the closing delimiter (may need to be pushed to the next line)
         @out.write(LINE_BREAK) if @cur_len + 2 > @line_length
-        @out.write(ENDING)
+        @out.write(ENDING_MARKER)
 
         @out.flush
         @out
