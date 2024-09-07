@@ -63,6 +63,12 @@ describe Ascii85 do
       end
     end
 
+    it 'should always return unfrozen Strings' do
+      TEST_CASES.each_pair do |input, encoded|
+        assert_equal false, Ascii85.encode(input).frozen?
+      end
+    end
+
     it 'should encode Strings in different encodings correctly' do
       input_euc_jp = 'どうもありがとうミスターロボット'.encode('EUC-JP')
       input_binary = input_euc_jp.force_encoding('ASCII-8BIT')
@@ -143,6 +149,12 @@ describe Ascii85 do
       end
     end
 
+    it 'should always return unfrozen Strings' do
+      TEST_CASES.each_pair do |input, encoded|
+        assert_equal false, Ascii85.decode(encoded).frozen?
+      end
+    end
+
     it 'should accept valid input in encodings other than the default' do
       input = 'Ragnarök  τέχνη  русский язык  I ♥ Ruby'
       input_ascii85 = Ascii85.encode(input)
@@ -218,6 +230,13 @@ describe Ascii85 do
       TEST_CASES.each_pair do |decoded, input|
         raw_input = input[2...-2] # Remove '<~' and '~>'
         assert_equal decoded.dup.force_encoding('ASCII-8BIT'), Ascii85.decode_raw(raw_input)
+      end
+    end
+
+    it 'should always return unfrozen Strings' do
+      TEST_CASES.each_pair do |decoded, input|
+        raw_input = input[2...-2] # Remove '<~' and '~>'
+        assert_equal false, Ascii85.decode_raw(raw_input).frozen?
       end
     end
 
