@@ -1,5 +1,11 @@
 # Ascii85 Changelog
 
+## [2.0.1] - Unreleased
+
+### Fixed
+
+- Decoding binary data could lead to Encoding errors (Issue #8)
+
 ## [2.0.0] - 2024-08-20
 
 ### BREAKING CHANGES
