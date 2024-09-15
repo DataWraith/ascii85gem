@@ -1,6 +1,6 @@
 # Ascii85 Changelog
 
-## [2.0.1] - Unreleased
+## [2.0.1] - 2024-09-15
 
 ### Fixed
 
