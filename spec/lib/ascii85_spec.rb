@@ -211,6 +211,12 @@ describe Ascii85 do
         assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~s8W-#~>') }
       end
 
+      it 'should raise DecodingError if the last, partial tuple is >= 2**32' do
+        assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~s8W-~>') }
+        assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~!!!!!uu~>') }
+        assert_equal "\xFF\xFF\xFF".b, Ascii85.decode('<~s8W*~>')
+      end
+
       it 'should raise DecodingError if it encounters an invalid character' do
         assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~!!y!!~>') }
       end
