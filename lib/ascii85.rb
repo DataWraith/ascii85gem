@@ -303,6 +303,8 @@ module Ascii85
       count -= 1
       word  += lut[count]
 
+      raise(Ascii85::DecodingError, "Invalid Ascii85 5-tuple (#{word} >= 2**32)") if word > 0xffffffff
+
       bufwriter.write((word >> 24).chr) if count >= 1
       bufwriter.write(((word >> 16) & 0xff).chr) if count >= 2
       bufwriter.write(((word >> 8) & 0xff).chr) if count == 3
