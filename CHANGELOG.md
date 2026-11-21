@@ -1,5 +1,11 @@
 # Ascii85 Changelog
 
+## [2.0.2] - 2026-11-21
+
+### Fixed
+
+- Decoding a partial, trailing 5-tuple to a value >= 2**32 raised `RangeError` instead of `DecodingError` (Issue #9)
+
 ## [2.0.1] - 2024-09-15
 
 ### Fixed
