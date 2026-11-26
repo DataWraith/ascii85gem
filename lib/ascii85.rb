@@ -299,9 +299,10 @@ module Ascii85
 
       raise(Ascii85::DecodingError, 'Last 5-tuple consists of single character') if count == 1
 
-      # Finish last, partially decoded 32-bit word
+      # Finish last, partially decoded 32-bit word by padding it with 'u'
+      # characters (84 each), which adds 85**(5 - count) - 1 to the word.
       count -= 1
-      word  += lut[count]
+      word  += lut[count] - 1
 
       raise(Ascii85::DecodingError, "Invalid Ascii85 5-tuple (#{word} >= 2**32)") if word > 0xffffffff
 

@@ -206,6 +206,13 @@ describe Ascii85 do
       assert_equal 'Ruby', output.string
     end
 
+    it 'should pad the last, partial tuple with u characters' do
+      # Non-canonical tuples where padding with u (84) gives a different
+      # result than adding one more (85).
+      assert_equal "\x1C8".b, Ascii85.decode("<~*'!~>")
+      assert_equal "\xC7\x92\xF9".b, Ascii85.decode('<~a--8~>')
+    end
+
     describe 'Error conditions' do
       it 'should raise DecodingError if it encounters a word >= 2**32' do
         assert_raises(Ascii85::DecodingError) { Ascii85.decode('<~s8W-#~>') }
