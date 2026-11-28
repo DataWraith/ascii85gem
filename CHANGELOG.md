@@ -1,5 +1,24 @@
 # Ascii85 Changelog
 
+## [3.0.0] - 2026-11-29
+
+This release does not affect normal use, but the changes are backwards-
+incompatible when non-canonical input is provided.
+
+### BREAKING CHANGES
+
+The decoder output changes for non-canonical input in the last tuple. Input
+for the decoder is non-canonical if an encoder does not produce it from the
+string the tuple decodes to.
+
+### Fixed
+
+- Fixed an off-by-one error in decoding trailing tuples (Issue #11).
+
+  The fix corrects the padding used for incomplete trailing tuples, resulting
+  in output that is sometimes different from version 2.0.2 for non-canonical
+  input. The previous output could be too large by `1`.
+
 ## [2.0.2] - 2026-11-21
 
 ### Fixed
