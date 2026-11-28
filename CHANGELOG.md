@@ -8,8 +8,8 @@ incompatible when non-canonical input is provided.
 ### BREAKING CHANGES
 
 The decoder output changes for non-canonical input in the last tuple. Input
-for the decoder is non-canonical if an encoder does not produce it from the
-string the tuple decodes to.
+is non-canonical if the encoder does not produce it from the string the tuple
+decodes to (it does not round-trip).
 
 ### Fixed
 
